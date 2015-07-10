@@ -101,12 +101,6 @@ function safeRun(command) {
   }
 }
 
-function gitTagAndPush(vVersion) {
-  safeRun(`changelog --title ${vVersion} -s | git tag -a -F - ${vVersion}`);
-  safeRun('git push');
-  safeRun('git push --tags');
-}
-
 function release({ type, preid }) {
   if (type === undefined && !preid) printErrorAndExit('Must specify version type or preid');
 
@@ -172,7 +166,9 @@ function release({ type, preid }) {
 
   // tag and release
   console.log('Tagging: '.cyan + vVersion.green);
-  gitTagAndPush(vVersion);
+  safeRun(`changelog --title ${vVersion} -s | git tag -a -F - ${vVersion}`);
+  safeRun('git push');
+  safeRun('git push --tags');
   console.log('Tagged: '.cyan + vVersion.green);
 
   // npm
@@ -181,22 +177,28 @@ function release({ type, preid }) {
   console.log('Released: '.cyan + 'npm package'.green);
 
   // bower
-  console.log('Releasing: '.cyan + 'bower package'.green);
-  rm('-rf', tmpBowerRepo);
-  run(`git clone ${bowerRepo} ${tmpBowerRepo}`);
-  pushd(tmpBowerRepo);
-  rm('-rf', ls(tmpBowerRepo).filter(file => file !== '.git')); // delete all but `.git` dir
-  cp('-R', bowerRoot, tmpBowerRepo);
-  safeRun('git add -A .');
-  safeRun(`git commit -m "Release ${vVersion}"`);
-  gitTagAndPush(vVersion);
-  popd();
-  if (argv.dryRun) {
-    console.log(`[rm -rf ${tmpBowerRepo}]`.grey, 'DRY RUN'.magenta);
-  } else {
+  if (bowerRepo) {
+    console.log('Releasing: '.cyan + 'bower package'.green);
     rm('-rf', tmpBowerRepo);
+    run(`git clone ${bowerRepo} ${tmpBowerRepo}`);
+    pushd(tmpBowerRepo);
+    rm('-rf', ls(tmpBowerRepo).filter(file => file !== '.git')); // delete all but `.git` dir
+    cp('-R', bowerRoot, tmpBowerRepo);
+    safeRun('git add -A .');
+    safeRun(`git commit -m "Release ${vVersion}"`);
+    safeRun(`git tag -a --message=${vVersion} ${vVersion}`);
+    safeRun('git push');
+    safeRun('git push --tags');
+    popd();
+    if (argv.dryRun) {
+      console.log(`[rm -rf ${tmpBowerRepo}]`.grey, 'DRY RUN'.magenta);
+    } else {
+      rm('-rf', tmpBowerRepo);
+    }
+    console.log('Released: '.cyan + 'bower package'.green);
+  } else {
+    console.log('The "bowerRepo" is not set in package.json. Not publishing bower.'.yellow);
   }
-  console.log('Released: '.cyan + 'bower package'.green);
 
   console.log('Version '.cyan + `v${newVersion}`.green + ' released!'.cyan);
 }
