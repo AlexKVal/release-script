@@ -1,0 +1,51 @@
+{
+  "name": "release-script",
+  "version": "0.0.0",
+  "description": "Release tools for projects. From github repo to npm and bower packages",
+  "main": "./bin/release.js",
+  "bin": {
+    "release": "./bin/release.js"
+  },
+  "files": [
+    "LICENSE",
+    "README.md",
+    "bin",
+    "lib"
+  ],
+  "scripts": {
+    "build": "babel src --out-dir lib",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:alexkval/release-script.git"
+  },
+  "keywords": [
+    "release",
+    "tools"
+  ],
+  "author": {
+    "name": "Alexander Shemetovsky",
+    "email": "alexkval@gmail.com"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/AlexKVal/release-script/issues"
+  },
+  "homepage": "https://github.com/AlexKVal/release-script#readme",
+  "peerDependencies": {
+    "mt-changelog": "^0.5.3"
+  },
+  "devDependencies": {
+    "babel": "^5.6.14",
+    "babel-eslint": "^3.1.23",
+    "eslint": "^0.24.0",
+    "mt-changelog": "^0.5.3"
+  },
+  "dependencies": {
+    "colors": "^1.1.2",
+    "semver": "^4.3.6",
+    "shelljs": "^0.5.1",
+    "yargs": "^3.15.0"
+  }
+}
