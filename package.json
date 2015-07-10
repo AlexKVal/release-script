@@ -9,11 +9,10 @@
   "files": [
     "LICENSE",
     "README.md",
-    "bin",
-    "lib"
+    "bin"
   ],
   "scripts": {
-    "build": "babel src --out-dir lib",
+    "build": "babel src --out-dir bin && chmod +x ./bin/release.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

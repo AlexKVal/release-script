@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 /* globals cat, config, cp, ls, popd, pushd, pwd, rm, exec, exit */
 /* eslint curly: 0 */
 import 'colors';
@@ -20,17 +21,17 @@ const npmjson = JSON.parse(cat(packagePath));
 const bowerRoot = path.join(repoRoot, (npmjson.bowerRoot || 'amd/'));
 const tmpBowerRepo = path.join(repoRoot, (npmjson.tmpBowerRepo || 'tmp-bower-repo'));
 
-let bowerRepo;
-if (npmjson.bowerRepo) {
-  bowerRepo = npmjson.bowerRepo;
-} else {
-  let match = npmjson.repository.url.match(/^git@github\.com:(.*)\.git$/);
-  match = match || npmjson.repository.url.match(/^git\+https:\/\/github\.com\/(.*)\.git$/);
-  let gitUrlBase = match && match[1];
-  gitUrlBase = gitUrlBase || npmjson.repository.url;
-  bowerRepo = `git@github.com:${gitUrlBase}-bower.git`;
-}
-
+// let bowerRepo;
+// if (npmjson.bowerRepo) {
+//   bowerRepo = npmjson.bowerRepo;
+// } else {
+//   let match = npmjson.repository.url.match(/^git@github\.com:(.*)\.git$/);
+//   match = match || npmjson.repository.url.match(/^git\+https:\/\/github\.com\/(.*)\.git$/);
+//   let gitUrlBase = match && match[1];
+//   gitUrlBase = gitUrlBase || npmjson.repository.url;
+//   bowerRepo = `git@github.com:${gitUrlBase}-bower.git`;
+// }
+const bowerRepo = npmjson.bowerRepo; // if it is not set, then there is no bower repo
 
 //------------------------------------------------------------------------------
 // command line options
