@@ -1,3 +1,10 @@
+v0.1.0 - Fri, 10 Jul 2015 18:43:40 GMT
+--------------------------------------
+
+- [c2dee37](../../commit/c2dee37) [added] instruction and introduction into readme
+
+
+
 v0.0.1 - Fri, 10 Jul 2015 17:36:20 GMT
 --------------------------------------
 

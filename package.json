@@ -1,6 +1,6 @@
 {
   "name": "release-script",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Release tools for projects. From github repo to npm and bower packages",
   "main": "./bin/release.js",
   "bin": {
