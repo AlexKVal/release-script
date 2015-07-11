@@ -80,5 +80,29 @@ You can use `--dry-run` option to check first what will be done and if it is OK.
 ```
 This option prevents `danger` steps from running. (`git push`, `npm publish` etc)
 
+If you don't have smth like that in your shell:
+```sh
+# npm
+export PATH="./node_modules/.bin:$PATH"
+```
+then you have to type the commands like this:
+```sh
+> ./node_modules/.bin/release minor --preid alpha
+```
+
+Or you just can install `release-script` globally.
+
+You also can add some helpful `script` commands to your `package.json`,
+and because `npm` adds `node_modules/.bin` into `PATH` for running scripts automatically,
+you can add them just like that:
+```js
+"scripts": {
+    ...
+    "patch": "release patch",
+    "minor": "release minor",
+    "major": "release major"
+```
+
+
 ## License
 `release-script` is licensed under the [MIT License](https://github.com/alexkval/release-script/blob/master/LICENSE).
