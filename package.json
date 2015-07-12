@@ -2,7 +2,6 @@
   "name": "release-script",
   "version": "0.1.1",
   "description": "Release tools for projects. From github repo to npm and bower packages",
-  "main": "./bin/release.js",
   "bin": {
     "release": "./bin/release.js"
   },
@@ -24,7 +23,9 @@
     "url": "git@github.com:alexkval/release-script.git"
   },
   "keywords": [
+    "release-tools",
     "release",
+    "script",
     "tools"
   ],
   "author": {
@@ -47,7 +48,7 @@
   },
   "dependencies": {
     "colors": "^1.1.2",
-    "semver": "^4.3.6",
+    "semver": "^5.0.0",
     "shelljs": "^0.5.1",
     "yargs": "^3.15.0"
   }
