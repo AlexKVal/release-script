@@ -1,3 +1,10 @@
+v0.1.2 - Sun, 12 Jul 2015 09:16:05 GMT
+--------------------------------------
+
+- [94ed987](../../commit/94ed987) [fixed] removed unnecessary 'main' field from package.json
+
+
+
 v0.1.1 - Sat, 11 Jul 2015 09:37:15 GMT
 --------------------------------------
 
