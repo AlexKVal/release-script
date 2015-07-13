@@ -181,7 +181,11 @@ function release({ type, preid }) {
 
   // tag and release
   console.log('Tagging: '.cyan + vVersion.green);
-  safeRun(`changelog --title ${vVersion} -s | git tag -a -F - ${vVersion}`);
+  if (isCommitsChangelogUsed) {
+    safeRun(`changelog --title ${vVersion} -s | git tag -a -F - ${vVersion}`);
+  } else {
+    safeRun(`git tag -a --message=${vVersion} ${vVersion}`);
+  }
   safeRun('git push');
   safeRun('git push --tags');
   console.log('Tagged: '.cyan + vVersion.green);
