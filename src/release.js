@@ -18,8 +18,9 @@ const changelog = path.join(repoRoot, 'CHANGELOG.md');
 
 const npmjson = JSON.parse(cat(packagePath));
 
-const bowerRoot = path.join(repoRoot, (npmjson.bowerRoot || 'amd/'));
-const tmpBowerRepo = path.join(repoRoot, (npmjson.tmpBowerRepo || 'tmp-bower-repo'));
+const configOptions = npmjson['release-script'] || {};
+const bowerRoot = path.join(repoRoot, (configOptions.bowerRoot || 'amd/'));
+const tmpBowerRepo = path.join(repoRoot, (configOptions.tmpBowerRepo || 'tmp-bower-repo'));
 
 // let bowerRepo;
 // if (npmjson.bowerRepo) {
@@ -31,7 +32,7 @@ const tmpBowerRepo = path.join(repoRoot, (npmjson.tmpBowerRepo || 'tmp-bower-rep
 //   gitUrlBase = gitUrlBase || npmjson.repository.url;
 //   bowerRepo = `git@github.com:${gitUrlBase}-bower.git`;
 // }
-const bowerRepo = npmjson.bowerRepo; // if it is not set, then there is no bower repo
+const bowerRepo = configOptions.bowerRepo; // if it is not set, then there is no bower repo
 
 //------------------------------------------------------------------------------
 // command line options

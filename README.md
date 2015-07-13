@@ -16,9 +16,11 @@ Say the name of your project is:
 Then name `bower` github repo as:
 `original-project-name-bower`.
 
-Add `bowerRepo` into your `package.json`:
+Add `'release-script'.bowerRepo` into your `package.json`:
 ```js
-"bowerRepo": "git@github.com:<author>/original-project-name-bower.git",
+"release-script": {
+  "bowerRepo": "git@github.com:<author>/original-project-name-bower.git"
+}
 ```
 
 Then add additional step into your building process,
@@ -63,9 +65,11 @@ that have been written by [Matt Smith @mtscout6](https://github.com/mtscout6)
 > npm install -D release-script
 ```
 
-Set `bowerRepo` into your `package.json` if you need `bower` releases too.
+Set `'release-script'.bowerRepo` into your `package.json` if you need `bower` releases too.
 ```js
-"bowerRepo": "git@github.com:<org-author-name>/<name-of-project>-bower.git",
+"release-script": {
+  "bowerRepo": "git@github.com:<org-author-name>/<name-of-project>-bower.git"
+}
 ```
 
 Then you can release like that:
