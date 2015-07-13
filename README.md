@@ -41,9 +41,13 @@ All options for this package are kept under `'release-script'` node in your proj
 
 - `bowerRepo` - the full url to github project for the bower pkg files
 - `bowerRoot` - the folder name where your `npm run build` command will put/transpile files for bower pkg
+  - `default` value: `'amd'`
 - `tmpBowerRepo` - the folder name for temporary files for bower pkg.
+  - `default` value: `'tmp-bower-repo'`
 
 It is advised to add `bowerRoot` and `tmpBowerRepo` folders to your `.gitignore` file.
+
+All options are optional.
 
 E.g.:
 ```js
