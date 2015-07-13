@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* globals cat, config, cp, ls, popd, pushd, pwd, rm, exec, exit */
+/* globals cat, config, cp, ls, popd, pushd, pwd, rm, exec, exit, which */
 /* eslint curly: 0 */
 import 'colors';
 import 'shelljs/global';
@@ -18,6 +18,17 @@ const changelog = path.join(repoRoot, 'CHANGELOG.md');
 
 const npmjson = JSON.parse(cat(packagePath));
 
+//------------------------------------------------------------------------------
+// check if one of 'rf-changelog' or 'mt-changelog' is used by project
+const devDepsNode = npmjson.devDependencies;
+const isCommitsChangelogUsed = devDepsNode &&
+  devDepsNode['rf-changelog'] || devDepsNode['mt-changelog'];
+if (isCommitsChangelogUsed && !which('changelog')) {
+  printErrorAndExit('The "[rf|mt]-changelog" package is present in "devDependencies", but it is not installed.');
+}
+
+//------------------------------------------------------------------------------
+// options
 const configOptions = npmjson['release-script'] || {};
 const bowerRoot = path.join(repoRoot, (configOptions.bowerRoot || 'amd/'));
 const tmpBowerRepo = path.join(repoRoot, (configOptions.tmpBowerRepo || 'tmp-bower-repo'));
@@ -157,13 +168,16 @@ function release({ type, preid }) {
   }
   console.log('Completed: '.cyan + 'build'.green);
 
-  // generate changelog
   const vVersion = `v${newVersion}`;
 
-  run(`changelog --title ${vVersion} --out ${changelog}`);
-  safeRun(`git add ${changelog}`);
+  // generate changelog
+  if (isCommitsChangelogUsed) {
+    run(`changelog --title ${vVersion} --out ${changelog}`);
+    safeRun(`git add ${changelog}`);
+    console.log('Generated Changelog'.cyan);
+  }
+
   safeRun(`git commit -m "Release ${vVersion}"`);
-  console.log('Generated Changelog'.cyan);
 
   // tag and release
   console.log('Tagging: '.cyan + vVersion.green);

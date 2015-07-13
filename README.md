@@ -61,9 +61,9 @@ E.g.:
 - checks linting and tests by running `npm run test` command
 - does version bump, with `preid` if it is requested
 - builds all by `npm run build` command
-- generates changelog using `mt-changelog`
-- adds and commits changed `CHANGELOG.md` and `package.json` files to git repo
-- adds git tag with changelog message and new version
+- if one of `[rf|mt]-changelog` is used in 'devDependencies', then changelog is generated
+- adds and commits changed `package.json` (and `CHANGELOG.md`, if used) files to git repo
+- adds git tag with new version (and changelog message, if used)
 - pushes changes to github repo
 - releases npm package by `npm publish` command
 - if `bowerRepo` field is present in the `package.json`, then it releases bower package:
