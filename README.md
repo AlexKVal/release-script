@@ -35,6 +35,25 @@ including `bower` publishing, for you automatically.
 Initial idea is got from `React-Bootstrap` release tools `./tools/release`,
 that have been written by [Matt Smith @mtscout6](https://github.com/mtscout6)
 
+#### Options
+
+All options for this package are kept under `'release-script'` node in your project's `package.json`
+
+- `bowerRepo` - the full url to github project for the bower pkg files
+- `bowerRoot` - the folder name where your `npm run build` command will put/transpile files for bower pkg
+- `tmpBowerRepo` - the folder name for temporary files for bower pkg.
+
+It is advised to add `bowerRoot` and `tmpBowerRepo` folders to your `.gitignore` file.
+
+E.g.:
+```js
+"release-script": {
+  "bowerRepo": "git@github.com:<org-author-name>/<name-of-project>-bower.git",
+  "bowerRoot": "amd",
+  "tmpBowerRepo": "tmp-bower-repo"
+}
+```
+
 #### This script does following steps:
 
 - ensures that git repo has no pending changes
@@ -49,12 +68,9 @@ that have been written by [Matt Smith @mtscout6](https://github.com/mtscout6)
 - releases npm package by `npm publish` command
 - if `bowerRepo` field is present in the `package.json`, then it releases bower package:
   - clones bower repo to local `tmpBowerRepo` temp folder. `git clone bowerRepo tmpBowerRepo`
-    - By default it is named `tmp-bower-repo`
-    - It is possible to set a custom `tmpBowerRepo` field in the `package.json`
   - then it cleans up all but `.git` files in the `tmpBowerRepo`
   - then copies all files from `bowerRoot` to `tmpBowerRepo`
     - (that has to be generated with `npm run build`)
-    - `bowerRoot` also can be set to a custom value in the `package.json`
   - then by `git add -A .` adds all bower distr files to the temporary git repo
   - commits, tags and pushes the same as for the `npm` package.
   - then deletes the `tmpBowerRepo` folder
