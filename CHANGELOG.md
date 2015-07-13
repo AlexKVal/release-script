@@ -1,3 +1,12 @@
+v0.2.0 - Mon, 13 Jul 2015 14:51:28 GMT
+--------------------------------------
+
+- [cf2b9df](../../commit/cf2b9df) [changed] the usage of '[rf|mt]-changelog' package is optional now
+- [6551bab](../../commit/6551bab) [added] options description.
+- [556ad50](../../commit/556ad50) [changed] all options has been moved under the common json node
+
+
+
 v0.1.2 - Sun, 12 Jul 2015 09:16:05 GMT
 --------------------------------------
 
