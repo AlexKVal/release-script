@@ -1,3 +1,10 @@
+v0.2.1 - Mon, 13 Jul 2015 15:03:31 GMT
+--------------------------------------
+
+- [b4c6d9f](../../commit/b4c6d9f) [fixed] changelog usage with 'git tag command'
+
+
+
 v0.2.0 - Mon, 13 Jul 2015 14:51:28 GMT
 --------------------------------------
 
