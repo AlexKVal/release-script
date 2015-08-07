@@ -64,7 +64,8 @@ E.g.:
 - ensures that git repo last version is fetched
 - checks linting and tests by running `npm run test` command
 - does version bump, with `preid` if it is requested
-- builds all by `npm run build` command
+- builds all by running `npm run build` command
+  - If there is no `build` script, then `release-script` just skips the `build` step.
 - if one of `[rf|mt]-changelog` is used in 'devDependencies', then changelog is generated
 - adds and commits changed `package.json` (and `CHANGELOG.md`, if used) files to git repo
 - adds git tag with new version (and changelog message, if used)

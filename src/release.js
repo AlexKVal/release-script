@@ -156,17 +156,21 @@ function release({ type, preid }) {
   safeRun('git add package.json');
 
   // npm run build
-  console.log('Running: '.cyan + 'build'.green);
-  const res = exec('npm run build');
-  if (res.code !== 0) {
-    // if error, then revert and exit
-    console.log('Build failed, reverting version bump'.red);
-    run('git reset HEAD .');
-    run('git checkout package.json');
-    console.log('Version bump reverted'.red);
-    printErrorAndExit(res.output);
+  if (npmjson.scripts.build) {
+    console.log('Running: '.cyan + 'build'.green);
+    const res = exec('npm run build');
+    if (res.code !== 0) {
+      // if error, then revert and exit
+      console.log('Build failed, reverting version bump'.red);
+      run('git reset HEAD .');
+      run('git checkout package.json');
+      console.log('Version bump reverted'.red);
+      printErrorAndExit(res.output);
+    }
+    console.log('Completed: '.cyan + 'build'.green);
+  } else {
+    console.log('There is no "build" script in package.json. Skipping this step.'.yellow);
   }
-  console.log('Completed: '.cyan + 'build'.green);
 
   const vVersion = `v${newVersion}`;
 
