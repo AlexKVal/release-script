@@ -17,6 +17,7 @@ const packagePath = path.join(repoRoot, 'package.json');
 const changelog = path.join(repoRoot, 'CHANGELOG.md');
 
 const npmjson = JSON.parse(cat(packagePath));
+const isPrivate = npmjson.private;
 
 //------------------------------------------------------------------------------
 // check if one of 'rf-changelog' or 'mt-changelog' is used by project
@@ -195,12 +196,18 @@ function release({ type, preid }) {
   console.log('Tagged: '.cyan + vVersion.green);
 
   // npm
-  console.log('Releasing: '.cyan + 'npm package'.green);
-  safeRun('npm publish');
-  console.log('Released: '.cyan + 'npm package'.green);
+  if (isPrivate) {
+    console.log('Package is private, skipping npm release'.yellow);
+  } else {
+    console.log('Releasing: '.cyan + 'npm package'.green);
+    safeRun('npm publish');
+    console.log('Released: '.cyan + 'npm package'.green);
+  }
 
   // bower
-  if (bowerRepo) {
+  if (isPrivate) {
+    console.log('Package is private, skipping bower release'.yellow);
+  } else if (bowerRepo) {
     console.log('Releasing: '.cyan + 'bower package'.green);
     rm('-rf', tmpBowerRepo);
     run(`git clone ${bowerRepo} ${tmpBowerRepo}`);
