@@ -58,6 +58,24 @@ E.g.:
 }
 ```
 
+#### GitHub releases
+
+If you want this script to publish github releases,
+you can generate token https://github.com/settings/tokens for it
+and set `env.GITHUB_TOKEN` to it like this:
+```sh
+> GITHUB_TOKEN="xxxxxxxxxxxx" && release-script patch
+```
+or through your shell scripts
+```sh
+export GITHUB_TOKEN="xxxxxxxxxxxx"
+```
+You can set a custom message for release via `--notes` CLI option:
+```
+> release patch --notes "This is small fix"
+```
+
+
 #### This script does following steps:
 
 - ensures that git repo has no pending changes
@@ -70,6 +88,7 @@ E.g.:
 - adds and commits changed `package.json` (and `CHANGELOG.md`, if used) files to git repo
 - adds git tag with new version (and changelog message, if used)
 - pushes changes to github repo
+- if github token is present, publishes release to GitHub, named as `<repo> vx.x.x`
 - releases npm package by `npm publish` command
 - if `bowerRepo` field is present in the `package.json`, then it releases bower package:
   - clones bower repo to local `tmpBowerRepo` temp folder. `git clone bowerRepo tmpBowerRepo`
@@ -127,6 +146,21 @@ you can add them just like that:
     "minor": "release minor",
     "major": "release major"
 ```
+
+Also you can add it like this:
+```js
+"scripts": {
+    ...
+    "release": "release",
+```
+And then you can run it like that:
+```
+> npm run release minor -- --preid alpha
+> npm run release patch -- --notes "This is small fix"
+> npm run release major -- --dry-run
+etc
+```
+_Notice: you have to add additional `--` before any `--option`. That way additional options will get straight to `release-script`._
 
 
 ## License

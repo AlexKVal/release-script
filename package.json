@@ -46,6 +46,7 @@
   },
   "dependencies": {
     "colors": "^1.1.2",
+    "request": "^2.60.0",
     "semver": "^5.0.0",
     "shelljs": "^0.5.1",
     "yargs": "^3.15.0"
