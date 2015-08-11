@@ -220,7 +220,7 @@ function release({ type, preid }) {
     if (argv.dryRun) {
       console.log(`[publishing to GitHub]`.grey, 'DRY RUN'.magenta);
     } else {
-      const [githubOwner, githubRepo] = getOwnerAndRepo(npmjson.repository.url);
+      const [githubOwner, githubRepo] = getOwnerAndRepo(npmjson.repository.url || npmjson.repository);
 
       request({
         uri: `https://api.github.com/repos/${githubOwner}/${githubRepo}/releases`,
