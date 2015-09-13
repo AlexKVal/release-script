@@ -1,3 +1,10 @@
+v0.2.6 - Sun, 13 Sep 2015 18:20:38 GMT
+--------------------------------------
+
+- [12b8af8](../../commit/12b8af8) [changed] Only push once for both the commit and tags
+
+
+
 v0.2.5 - Thu, 13 Aug 2015 14:10:46 GMT
 --------------------------------------
 
