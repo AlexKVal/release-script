@@ -208,8 +208,7 @@ function release({ type, preid }) {
   } else {
     safeRun(`git tag -a --message="${versionAndNotes}" ${vVersion}`);
   }
-  safeRun('git push');
-  safeRun('git push --tags');
+  safeRun('git push --follow-tags');
   console.log('Tagged: '.cyan + vVersion.green);
 
   // publish to GitHub
