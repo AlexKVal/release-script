@@ -41,7 +41,8 @@
     "babel": "^5.6.14",
     "babel-eslint": "^4.0.5",
     "eslint": "^1.0.0",
-    "eslint-config-defaults": "^4.0.1",
+    "eslint-config-airbnb": "0.0.8",
+    "eslint-plugin-react": "^3.3.2",
     "mt-changelog": "^0.6.1"
   },
   "dependencies": {

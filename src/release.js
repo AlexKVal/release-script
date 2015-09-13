@@ -125,7 +125,7 @@ function safeRun(command) {
 function getOwnerAndRepo(url) {
   let match = url.match(/^git@github\.com:(.*)\.git$/);
   match = match || url.match(/^git\+https:\/\/github\.com\/(.*)\.git$/);
-  let gitUrlBase = match && match[1];
+  const gitUrlBase = match && match[1];
   return (gitUrlBase || url).split('/');
 }
 
@@ -236,7 +236,7 @@ function release({ type, preid }) {
           'Authorization': `token ${githubToken}`,
           'User-Agent': 'release-script (https://github.com/alexkval/release-script)'
         }
-      }, function (err, res, body) {
+      }, function(err, res, body) {
         if (err) {
           console.log('API request to GitHub, error has occured:'.red);
           console.log(err);
