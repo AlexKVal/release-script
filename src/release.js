@@ -273,8 +273,7 @@ function release({ type, preid }) {
     safeRun('git add -A .');
     safeRun(`git commit -m "Release ${vVersion}"`);
     safeRun(`git tag -a --message=${vVersion} ${vVersion}`);
-    safeRun('git push');
-    safeRun('git push --tags');
+    safeRun('git push --follow-tags');
     popd();
     if (argv.dryRun) {
       console.log(`[rm -rf ${tmpBowerRepo}]`.grey, 'DRY RUN'.magenta);
