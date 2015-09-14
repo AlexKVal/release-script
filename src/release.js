@@ -23,11 +23,14 @@ const devDepsNode = npmjson.devDependencies;
 
 //------------------------------------------------------------------------------
 // check if one of 'rf-changelog' or 'mt-changelog' is used by project
-const isCommitsChangelogUsed = devDepsNode &&
+let isCommitsChangelogUsed = devDepsNode &&
   devDepsNode['rf-changelog'] || devDepsNode['mt-changelog'];
 if (isCommitsChangelogUsed && !which('changelog')) {
   printErrorAndExit('The "[rf|mt]-changelog" package is present in "devDependencies", but it is not installed.');
 }
+
+const isWithinMtChangelog = npmjson.name === 'mt-changelog';
+isCommitsChangelogUsed = isCommitsChangelogUsed || isWithinMtChangelog;
 
 //------------------------------------------------------------------------------
 // options
@@ -193,8 +196,10 @@ function release({ type, preid }) {
   const versionAndNotes = notesForRelease = notesForRelease ? `${vVersion} ${notesForRelease}` : vVersion;
 
   // generate changelog
+  // within mt-changelog at this stage `./bin/changelog` is already built and tested
+  const changelogCmd = isWithinMtChangelog ? './bin/changelog' : 'changelog';
   if (isCommitsChangelogUsed) {
-    run(`changelog --title="${versionAndNotes}" --out ${changelog}`);
+    run(`${changelogCmd} --title="${versionAndNotes}" --out ${changelog}`);
     safeRun(`git add ${changelog}`);
     console.log('Generated Changelog'.cyan);
   }
@@ -204,7 +209,7 @@ function release({ type, preid }) {
   // tag and release
   console.log('Tagging: '.cyan + vVersion.green);
   if (isCommitsChangelogUsed) {
-    notesForRelease = run(`changelog --title="${versionAndNotes}" -s`);
+    notesForRelease = run(`${changelogCmd} --title="${versionAndNotes}" -s`);
     safeRun(`changelog --title="${versionAndNotes}" -s | git tag -a -F - ${vVersion}`);
   } else {
     safeRun(`git tag -a --message="${versionAndNotes}" ${vVersion}`);
