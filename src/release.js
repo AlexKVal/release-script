@@ -38,6 +38,7 @@ const bowerRepo = configOptions.bowerRepo; // if it is not set, then there is no
 
 const githubToken = process.env.GITHUB_TOKEN;
 
+const altPkgRootFolder = configOptions.altPkgRootFolder;
 
 //------------------------------------------------------------------------------
 // command line options
@@ -256,7 +257,26 @@ function release({ type, preid }) {
     console.log('Package is private, skipping npm release'.yellow);
   } else {
     console.log('Releasing: '.cyan + 'npm package'.green);
-    safeRun('npm publish');
+
+    // publishing just /altPkgRootFolder content
+    if (altPkgRootFolder) {
+      // prepare custom `package.json` without `scripts` and `devDependencies`
+      // because it already has been saved, we safely can use the same object
+      delete npmjson.files; // because otherwise it would be wrong
+      delete npmjson.scripts;
+      delete npmjson.devDependencies;
+      delete npmjson['release-script']; // this also doesn't belong to output
+      const regexp = new RegExp(altPkgRootFolder + '\\/?');
+      npmjson.main = npmjson.main.replace(regexp, ''); // remove folder part from path
+      `${JSON.stringify(npmjson, null, 2)}\n`.to(path.join(altPkgRootFolder, 'package.json'));
+
+      pushd(altPkgRootFolder);
+      safeRun('npm publish');
+      popd();
+    } else {
+      safeRun('npm publish');
+    }
+
     console.log('Released: '.cyan + 'npm package'.green);
   }
 
