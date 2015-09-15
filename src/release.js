@@ -47,11 +47,12 @@ const altPkgRootFolder = configOptions.altPkgRootFolder;
 // command line options
 const yargsConf = yargs
   .usage('Usage: $0 <version> [--preid <identifier>]')
-  .example('$0 minor --preid beta', 'Release with minor version bump with pre-release tag')
+  .example('$0 minor --preid beta', 'Release with minor version bump with pre-release tag. (npm tag `beta`)')
   .example('$0 major', 'Release with major version bump')
   .example('$0 major --notes "This is new cool version"', 'Add a custom message to release')
   .example('$0 major --dry-run', 'Release dry run with patch version bump')
-  .example('$0 --preid beta', 'Release same version with pre-release bump')
+  .example('$0 --preid alpha', 'Release same version with pre-release bump. (npm tag `alpha`)')
+  .example('$0 0.101.0 --preid rc --tag canary', 'Release `v0.101.0-rc.0` pre-release version with npm tag `canary`')
   .command('patch', 'Release patch')
   .command('minor', 'Release minor')
   .command('major', 'Release major')
@@ -61,11 +62,16 @@ const yargsConf = yargs
     describe: 'pre-release identifier',
     type: 'string'
   })
+  .option('tag', {
+    demand: false,
+    describe: 'Npm tag name for the pre-release version.\nIf it is not provided, then `preid` value is used',
+    type: 'string'
+  })
   .option('dry-run', {
     alias: 'n',
     demand: false,
     default: false,
-    describe: 'Execute command in dry run mode. Will not commit, tag, push, or publish anything. Userful for testing.'
+    describe: 'Execute command in dry run mode.\nWill not commit, tag, push, or publish anything.\nUserful for testing.'
   })
   .option('verbose', {
     demand: false,
@@ -75,7 +81,7 @@ const yargsConf = yargs
   .option('notes', {
     demand: false,
     default: false,
-    describe: 'A custom message for release. Overrides [rf|mt]changelog message'
+    describe: 'A custom message for release.\nOverrides [rf|mt]changelog message'
   });
 
 const argv = yargsConf.argv;
@@ -86,7 +92,8 @@ config.silent = !argv.verbose;
 
 const versionBumpOptions = {
   type: argv._[0],
-  preid: argv.preid
+  preid: argv.preid,
+  npmTagName: argv.tag || argv.preid
 };
 
 if (versionBumpOptions.type === undefined && versionBumpOptions.preid === undefined) {
@@ -133,7 +140,7 @@ function getOwnerAndRepo(url) {
   return (gitUrlBase || url).split('/');
 }
 
-function release({ type, preid }) {
+function release({ type, preid, npmTagName }) {
   if (type === undefined && !preid) printErrorAndExit('Must specify version type or preid');
 
   // ensure git repo has no pending changes
@@ -263,6 +270,8 @@ function release({ type, preid }) {
   } else {
     console.log('Releasing: '.cyan + 'npm package'.green);
 
+    const npmPublishCmd = preid ? `npm publish --tag ${npmTagName}` : 'npm publish';
+
     // publishing just /altPkgRootFolder content
     if (altPkgRootFolder) {
       // prepare custom `package.json` without `scripts` and `devDependencies`
@@ -276,10 +285,10 @@ function release({ type, preid }) {
       `${JSON.stringify(npmjson, null, 2)}\n`.to(path.join(altPkgRootFolder, 'package.json'));
 
       pushd(altPkgRootFolder);
-      safeRun('npm publish');
+      safeRun(npmPublishCmd);
       popd();
     } else {
-      safeRun('npm publish');
+      safeRun(npmPublishCmd);
     }
 
     console.log('Released: '.cyan + 'npm package'.green);
