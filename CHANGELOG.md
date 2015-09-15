@@ -1,3 +1,10 @@
+v0.3.0 - Tue, 15 Sep 2015 15:59:16 GMT
+--------------------------------------
+
+- [a8aaa5e](../../commit/a8aaa5e) [added] npm tags for pre-release versions
+
+
+
 v0.2.8 - Tue, 15 Sep 2015 13:50:43 GMT
 --------------------------------------
 
