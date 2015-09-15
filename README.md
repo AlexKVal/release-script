@@ -35,6 +35,24 @@ including `bower` publishing, for you - automatically.
 _Initial idea is got from `React-Bootstrap` release tools `./tools/release`,
 that have been written by [Matt Smith @mtscout6](https://github.com/mtscout6)_
 
+#### Pre-release versions publishing
+
+Say you need to publish pre-release `v0.25.100-pre.0` version
+with the `canary` npm tag name (instead of default one `latest`).
+
+You can do it by this way:
+```
+> release 0.25.100 --preid pre --tag canary
+or
+> npm run release 0.25.100 -- --preid pre --tag canary
+```
+
+If your `preid` tag and npm tag name are the same, then you can just:
+```
+> release 0.25.100 --preid beta
+```
+It will produce `v0.25.100-beta.0` and `npm publish --tag beta`.
+
 #### Alternative npm package root folder
 
 Say you want to publish to `npmjs` only the content of your `lib` folder.
@@ -102,9 +120,12 @@ You can set a custom message for release via `--notes` CLI option:
 - adds git tag with new version (and changelog message, if used)
 - pushes changes to github repo
 - if github token is present, publishes release to GitHub, named as `<repo> vx.x.x`
-- if `altPkgRootFolder` doesn't set it will just `npm publish` as usual
+- if `--preid` tag set, then `npm publish --tag` command for npm publishing is used
+  - through `--tag` one can set `npm tag name` for the pre-release version (e.g. `alpha` or `canary`)
+  - othewise `--preid` value will be used
+- if `altPkgRootFolder` doesn't set it will just `npm publish [--tag]` as usual
   - otherwise if `altPkgRootFolder` set then this script
-    - will `npm publish` from the `altPkgRootFolder` folder
+    - will `npm publish [--tag]` from the `altPkgRootFolder` folder
     - with the custom version of `package.json` with removed `scripts` and `devDependencies`
     - also it will remove the `altPkgRootFolder` part from the `main` file path
 - if `bowerRepo` field is present in the `package.json`, then it releases bower package:
