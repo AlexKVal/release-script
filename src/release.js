@@ -47,6 +47,8 @@ const githubToken = process.env.GITHUB_TOKEN;
 
 const altPkgRootFolder = configOptions.altPkgRootFolder;
 
+const skipBuildStep = configOptions.skipBuildStep;
+
 //------------------------------------------------------------------------------
 // command line options
 const yargsConf = yargs
@@ -151,6 +153,18 @@ function getOwnerAndRepo(url) {
   return (gitUrlBase || url).split('/');
 }
 
+function runAndGitRevertOnError(cmd) {
+  const res = exec(cmd);
+  if (res.code !== 0) {
+    // if error, then revert and exit
+    console.log(`"${cmd}" command failed, reverting version bump`.red);
+    run('git reset HEAD .');
+    run('git checkout package.json');
+    console.log('Version bump reverted'.red);
+    printErrorAndExit(res.output);
+  }
+}
+
 function releaseAdRepo(repo, srcFolder, tmpFolder, vVersion) {
   if (!repo || !srcFolder || !tmpFolder || !vVersion) {
     printErrorAndExit('Bug error. Create github issue: releaseAdRepo - One of parameters is not set.');
@@ -188,11 +202,6 @@ function release({ type, preid, npmTagName }) {
   }
   console.info('Current with latest changes from remote'.cyan);
 
-  // check linting and tests
-  console.log('Running: '.cyan + 'linting and tests'.green);
-  run('npm run test');
-  console.log('Completed: '.cyan + 'linting and tests'.green);
-
   // version bump
   const oldVersion = npmjson.version;
   let newVersion;
@@ -215,21 +224,22 @@ function release({ type, preid, npmTagName }) {
   console.log('Version changed from '.cyan + oldVersion.green + ' to '.cyan + newVersion.green);
   safeRun('git add package.json');
 
+  // npm run test
+  // this step is placed after version bumping
+  // for the case when documents are been built in "npm run test" script
+  console.log('Running: '.cyan + '"npm run test"'.green);
+  config.silent = !skipBuildStep;
+  runAndGitRevertOnError('npm run test');
+  config.silent = !argv.verbose;
+  console.log('Completed: '.cyan + '"npm run test"'.green);
+
   // npm run build
-  if (npmjson.scripts.build) {
+  if (npmjson.scripts.build && !skipBuildStep) {
     console.log('Running: '.cyan + 'build'.green);
-    const res = exec('npm run build');
-    if (res.code !== 0) {
-      // if error, then revert and exit
-      console.log('Build failed, reverting version bump'.red);
-      run('git reset HEAD .');
-      run('git checkout package.json');
-      console.log('Version bump reverted'.red);
-      printErrorAndExit(res.output);
-    }
+    runAndGitRevertOnError('npm run build');
     console.log('Completed: '.cyan + 'build'.green);
   } else {
-    console.log('There is no "build" script in package.json. Skipping this step.'.yellow);
+    console.log('Skipping "npm run build" step.'.yellow);
   }
 
   const vVersion = `v${newVersion}`;

@@ -102,6 +102,22 @@ Then you can do it as simple as adding this option to your `package.json`
 ```
 and that's all.
 
+#### The special case. `build` step in `tests` step.
+
+If you run building scripts within your `npm run test` step, e.g.
+```json
+"scripts": {
+  "test": "npm run lint && npm run build && npm run tests-set",
+}
+```
+then you can disable superfluous `npm run build` step running
+by setting `'release-script'.skipBuildStep` option:
+```json
+"release-script": {
+  "skipBuildStep": "true"
+}
+```
+
 #### Options
 
 All options for this package are kept under `'release-script'` node in your project's `package.json`
