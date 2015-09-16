@@ -50,7 +50,7 @@ const altPkgRootFolder = configOptions.altPkgRootFolder;
 //------------------------------------------------------------------------------
 // command line options
 const yargsConf = yargs
-  .usage('Usage: $0 <version> [--preid <identifier>]')
+  .usage('Usage: $0 <version> [--preid <identifier>]\nor\nUsage: $0 --only-docs')
   .example('$0 minor --preid beta', 'Release with minor version bump with pre-release tag. (npm tag `beta`)')
   .example('$0 major', 'Release with major version bump')
   .example('$0 major --notes "This is new cool version"', 'Add a custom message to release')
@@ -70,6 +70,12 @@ const yargsConf = yargs
     demand: false,
     describe: 'Npm tag name for the pre-release version.\nIf it is not provided, then `preid` value is used',
     type: 'string'
+  })
+  .option('only-docs', {
+    alias: 'docs',
+    demand: false,
+    default: false,
+    describe: 'Publish only documents'
   })
   .option('dry-run', {
     alias: 'n',
@@ -91,12 +97,13 @@ const yargsConf = yargs
 const argv = yargsConf.argv;
 
 if (argv.dryRun) console.log('DRY RUN'.magenta);
+if (argv.onlyDocs) console.log('Publish only documents'.magenta);
 
 config.silent = !argv.verbose;
 
 const versionBumpOptions = {
   type: argv._[0],
-  preid: argv.preid,
+  preid: argv.onlyDocs ? 'docs' : argv.preid,
   npmTagName: argv.tag || argv.preid
 };
 
@@ -250,85 +257,87 @@ function release({ type, preid, npmTagName }) {
   safeRun('git push --follow-tags');
   console.log('Tagged: '.cyan + vVersion.green);
 
-  // publish to GitHub
-  if (githubToken) {
-    console.log(`GitHub token found ${githubToken}`.green);
-    console.log('Publishing to GitHub: '.cyan + vVersion.green);
+  if (!argv.onlyDocs) {
+    // publish to GitHub
+    if (githubToken) {
+      console.log(`GitHub token found ${githubToken}`.green);
+      console.log('Publishing to GitHub: '.cyan + vVersion.green);
 
-    if (argv.dryRun) {
-      console.log(`[publishing to GitHub]`.grey, 'DRY RUN'.magenta);
-    } else {
-      const [githubOwner, githubRepo] = getOwnerAndRepo(npmjson.repository.url || npmjson.repository);
+      if (argv.dryRun) {
+        console.log(`[publishing to GitHub]`.grey, 'DRY RUN'.magenta);
+      } else {
+        const [githubOwner, githubRepo] = getOwnerAndRepo(npmjson.repository.url || npmjson.repository);
 
-      request({
-        uri: `https://api.github.com/repos/${githubOwner}/${githubRepo}/releases`,
-        method: 'POST',
-        json: true,
-        body: {
-          tag_name: vVersion, // eslint-disable-line camelcase
-          name: `${githubRepo} ${vVersion}`,
-          body: notesForRelease,
-          draft: false,
-          prerelease: !!preid
-        },
-        headers: {
-          'Authorization': `token ${githubToken}`,
-          'User-Agent': 'release-script (https://github.com/alexkval/release-script)'
-        }
-      }, function(err, res, body) {
-        if (err) {
-          console.log('API request to GitHub, error has occured:'.red);
-          console.log(err);
-          console.log('Skip GitHub releasing'.yellow);
-        } else if (res.statusMessage === 'Unauthorized') {
-          console.log(`GitHub token ${githubToken} is wrong`.red);
-          console.log('Skip GitHub releasing'.yellow);
-        } else {
-          console.log(`Published at ${body.html_url}`.green);
-        }
-      });
-    }
-  }
-
-  // npm
-  if (isPrivate) {
-    console.log('Package is private, skipping npm release'.yellow);
-  } else {
-    console.log('Releasing: '.cyan + 'npm package'.green);
-
-    const npmPublishCmd = preid ? `npm publish --tag ${npmTagName}` : 'npm publish';
-
-    // publishing just /altPkgRootFolder content
-    if (altPkgRootFolder) {
-      // prepare custom `package.json` without `scripts` and `devDependencies`
-      // because it already has been saved, we safely can use the same object
-      delete npmjson.files; // because otherwise it would be wrong
-      delete npmjson.scripts;
-      delete npmjson.devDependencies;
-      delete npmjson['release-script']; // this also doesn't belong to output
-      const regexp = new RegExp(altPkgRootFolder + '\\/?');
-      npmjson.main = npmjson.main.replace(regexp, ''); // remove folder part from path
-      `${JSON.stringify(npmjson, null, 2)}\n`.to(path.join(altPkgRootFolder, 'package.json'));
-
-      pushd(altPkgRootFolder);
-      safeRun(npmPublishCmd);
-      popd();
-    } else {
-      safeRun(npmPublishCmd);
+        request({
+          uri: `https://api.github.com/repos/${githubOwner}/${githubRepo}/releases`,
+          method: 'POST',
+          json: true,
+          body: {
+            tag_name: vVersion, // eslint-disable-line camelcase
+            name: `${githubRepo} ${vVersion}`,
+            body: notesForRelease,
+            draft: false,
+            prerelease: !!preid
+          },
+          headers: {
+            'Authorization': `token ${githubToken}`,
+            'User-Agent': 'release-script (https://github.com/alexkval/release-script)'
+          }
+        }, function(err, res, body) {
+          if (err) {
+            console.log('API request to GitHub, error has occured:'.red);
+            console.log(err);
+            console.log('Skip GitHub releasing'.yellow);
+          } else if (res.statusMessage === 'Unauthorized') {
+            console.log(`GitHub token ${githubToken} is wrong`.red);
+            console.log('Skip GitHub releasing'.yellow);
+          } else {
+            console.log(`Published at ${body.html_url}`.green);
+          }
+        });
+      }
     }
 
-    console.log('Released: '.cyan + 'npm package'.green);
-  }
+    // npm
+    if (isPrivate) {
+      console.log('Package is private, skipping npm release'.yellow);
+    } else {
+      console.log('Releasing: '.cyan + 'npm package'.green);
 
-  // bower
-  if (isPrivate) {
-    console.log('Package is private, skipping bower release'.yellow);
-  } else if (bowerRepo) {
-    console.log('Releasing: '.cyan + 'bower package'.green);
-    releaseAdRepo(bowerRepo, bowerRoot, tmpBowerRepo, vVersion);
-    console.log('Released: '.cyan + 'bower package'.green);
-  } else {
-    console.log('The "bowerRepo" is not set in package.json. Not publishing bower.'.yellow);
+      const npmPublishCmd = preid ? `npm publish --tag ${npmTagName}` : 'npm publish';
+
+      // publishing just /altPkgRootFolder content
+      if (altPkgRootFolder) {
+        // prepare custom `package.json` without `scripts` and `devDependencies`
+        // because it already has been saved, we safely can use the same object
+        delete npmjson.files; // because otherwise it would be wrong
+        delete npmjson.scripts;
+        delete npmjson.devDependencies;
+        delete npmjson['release-script']; // this also doesn't belong to output
+        const regexp = new RegExp(altPkgRootFolder + '\\/?');
+        npmjson.main = npmjson.main.replace(regexp, ''); // remove folder part from path
+        `${JSON.stringify(npmjson, null, 2)}\n`.to(path.join(altPkgRootFolder, 'package.json'));
+
+        pushd(altPkgRootFolder);
+        safeRun(npmPublishCmd);
+        popd();
+      } else {
+        safeRun(npmPublishCmd);
+      }
+
+      console.log('Released: '.cyan + 'npm package'.green);
+    }
+
+    // bower
+    if (isPrivate) {
+      console.log('Package is private, skipping bower release'.yellow);
+    } else if (bowerRepo) {
+      console.log('Releasing: '.cyan + 'bower package'.green);
+      releaseAdRepo(bowerRepo, bowerRoot, tmpBowerRepo, vVersion);
+      console.log('Released: '.cyan + 'bower package'.green);
+    } else {
+      console.log('The "bowerRepo" is not set in package.json. Not publishing bower.'.yellow);
+    }
   }
 
   // documents site

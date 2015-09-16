@@ -66,6 +66,13 @@ You can customize them as you need:
 }
 ```
 
+If you need to publish only documents (say with some minor fixes),
+this is as simple as:
+```
+> release --only-docs
+```
+In this case the `package.json` version will be bumped with `--preid docs` as `0.10.0` => `0.10.0-docs.0`
+
 #### Pre-release versions publishing
 
 Say you need to publish pre-release `v0.25.100-pre.0` version
@@ -169,6 +176,8 @@ You can set a custom message for release via `--notes` CLI option:
   - then deletes the `tmpBowerRepo` folder
 - id `docsRepo` field is present in the `package.json`, then it pushes builded documents to their repo.
   It is done the same way as `bower` repo.
+
+If command line `--only-docs` option is set, then `github`, `npm` and `bower` publishing steps will be skipped.
 
 ## Installation
 
