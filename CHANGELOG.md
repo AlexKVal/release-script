@@ -1,3 +1,11 @@
+v0.3.1 - Wed, 16 Sep 2015 12:33:32 GMT
+--------------------------------------
+
+- [e0d568d](../../commit/e0d568d) [added] '--only-docs' option
+- [4353c61](../../commit/4353c61) [added] document site releasing
+
+
+
 v0.3.0 - Tue, 15 Sep 2015 15:59:16 GMT
 --------------------------------------
 
