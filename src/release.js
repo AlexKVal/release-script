@@ -42,6 +42,7 @@ const bowerRepo = configOptions.bowerRepo; // if it is not set, then there is no
 const docsRoot = path.join(repoRoot, (configOptions.docsRoot || 'docs-built/'));
 const tmpDocsRepo = path.join(repoRoot, (configOptions.tmpDocsRepo || 'tmp-docs-repo'));
 const docsRepo = configOptions.docsRepo; // if it is not set, then there is no docs/site repo
+const docsBuild = npmjson.scripts && npmjson.scripts['docs-build'];
 
 const githubToken = process.env.GITHUB_TOKEN;
 
@@ -234,12 +235,18 @@ function release({ type, preid, npmTagName }) {
   console.log('Completed: '.cyan + '"npm run test"'.green);
 
   // npm run build
-  if (npmjson.scripts.build && !skipBuildStep) {
-    console.log('Running: '.cyan + 'build'.green);
-    runAndGitRevertOnError('npm run build');
-    console.log('Completed: '.cyan + 'build'.green);
+  if (argv.onlyDocs && docsBuild) {
+    console.log('Running: '.cyan + 'docs-build'.green);
+    runAndGitRevertOnError('npm run docs-build');
+    console.log('Completed: '.cyan + 'docs-build'.green);
   } else {
-    console.log('Skipping "npm run build" step.'.yellow);
+    if (npmjson.scripts.build && !skipBuildStep) {
+      console.log('Running: '.cyan + 'build'.green);
+      runAndGitRevertOnError('npm run build');
+      console.log('Completed: '.cyan + 'build'.green);
+    } else {
+      console.log('Skipping "npm run build" step.'.yellow);
+    }
   }
 
   const vVersion = `v${newVersion}`;
