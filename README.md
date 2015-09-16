@@ -93,6 +93,9 @@ If your `preid` tag and npm tag name are the same, then you can just:
 ```
 It will produce `v0.25.100-beta.0` and `npm publish --tag beta`.
 
+`changelog` generated output will go into `CHANGELOG-alpha.md` for pre-releases,
+and with the next release this file will be removed.
+
 #### Alternative npm package root folder
 
 Say you want to publish to `npmjs` only the content of your `lib` folder.

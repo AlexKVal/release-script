@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* globals cat, config, cp, ls, popd, pushd, pwd, rm, exec, exit, which */
+/* globals cat, config, cp, ls, popd, pushd, pwd, rm, test, exec, exit, which */
 /* eslint curly: 0 */
 import 'colors';
 import 'shelljs/global';
@@ -15,7 +15,6 @@ config.fatal = false;
 // constants
 const repoRoot = pwd();
 const packagePath = path.join(repoRoot, 'package.json');
-const changelog = path.join(repoRoot, 'CHANGELOG.md');
 
 const npmjson = JSON.parse(cat(packagePath));
 const isPrivate = npmjson.private;
@@ -140,6 +139,11 @@ function safeRun(command) {
   }
 }
 
+function safeRm(...args) {
+  if (argv.dryRun) console.log(`[rm ${args.join(' ')}]`.grey, 'DRY RUN'.magenta);
+  else rm(args);
+}
+
 /**
  * Npm's `package.json` 'repository.url' could be set to one of three forms:
  * git@github.com:<author>/<repo-name>.git
@@ -181,11 +185,7 @@ function releaseAdRepo(repo, srcFolder, tmpFolder, vVersion) {
   safeRun(`git tag -a --message=${vVersion} ${vVersion}`);
   safeRun('git push --follow-tags');
   popd();
-  if (argv.dryRun) {
-    console.log(`[rm -rf ${tmpFolder}]`.grey, 'DRY RUN'.magenta);
-  } else {
-    rm('-rf', tmpFolder);
-  }
+  safeRm('-rf', tmpFolder);
 }
 
 function release({ type, preid, npmTagName }) {
@@ -255,9 +255,31 @@ function release({ type, preid, npmTagName }) {
   // generate changelog
   // within mt-changelog at this stage `./bin/changelog` is already built and tested
   const changelogCmd = isWithinMtChangelog ? './bin/changelog' : 'changelog';
+
+  const changelog = path.join(repoRoot, 'CHANGELOG.md');
+  const changelogAlpha = path.join(repoRoot, 'CHANGELOG-alpha.md');
+  let changelogOutput, changelogArgs;
+  if (preid) {
+    changelogOutput = changelogAlpha;
+    changelogArgs = '';
+  } else {
+    changelogOutput = changelog;
+    changelogArgs = '--exclude-pre-releases';
+  }
+
   if (isCommitsChangelogUsed) {
-    run(`${changelogCmd} --title="${versionAndNotes}" --out ${changelog}`);
+    let changelogAlphaRemovedFlag = false;
+    if (test('-e', changelogAlpha)) {
+      rm('-rf', changelogAlpha);
+      changelogAlphaRemovedFlag = true;
+    }
+
+    run(`${changelogCmd} --title="${versionAndNotes}" --out ${changelogOutput} ${changelogArgs}`);
     safeRun(`git add ${changelog}`);
+    if (preid || changelogAlphaRemovedFlag) {
+      safeRun(`git add -A ${changelogAlpha}`);
+    }
+
     console.log('Generated Changelog'.cyan);
   }
 
@@ -267,7 +289,7 @@ function release({ type, preid, npmTagName }) {
   console.log('Tagging: '.cyan + vVersion.green);
   if (isCommitsChangelogUsed) {
     notesForRelease = run(`${changelogCmd} --title="${versionAndNotes}" -s`);
-    safeRun(`changelog --title="${versionAndNotes}" -s | git tag -a -F - ${vVersion}`);
+    safeRun(`changelog --title="${versionAndNotes}" ${changelogArgs} -s | git tag -a -F - ${vVersion}`);
   } else {
     safeRun(`git tag -a --message="${versionAndNotes}" ${vVersion}`);
   }
