@@ -1,3 +1,12 @@
+v0.4.0 - Wed, 16 Sep 2015 17:07:17 GMT
+--------------------------------------
+
+- [2c52100](../../commit/2c52100) [added] 'CHANGELOG-alpha.md' is generating for pre-releases now
+- [73aa215](../../commit/73aa215) [changed] use 'npm run docs-build' instead of 'npm run build' for '--only-docs'
+- [602343a](../../commit/602343a) [added] 'skipBuildStep' special case option
+
+
+
 v0.3.1 - Wed, 16 Sep 2015 12:33:32 GMT
 --------------------------------------
 
