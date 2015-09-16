@@ -35,7 +35,7 @@ including `bower` publishing, for you - automatically.
 _Initial idea is got from `React-Bootstrap` release tools `./tools/release`,
 that have been written by [Matt Smith @mtscout6](https://github.com/mtscout6)_
 
-#### Publishing of built documents static pages
+#### Documents pages publishing
 
 If your project compiles static documentation pages (as e.g. `React-Boostrap` does)
 and needs to publish them to standalone repo / hosting (via `git push`),
@@ -71,7 +71,9 @@ this is as simple as:
 ```
 > release --only-docs
 ```
-In this case the `package.json` version will be bumped with `--preid docs` as `0.10.0` => `0.10.0-docs.0`
+In this case the `package.json` version will be bumped with `--preid docs` as `0.10.0` => `0.10.0-docs.0`.
+
+If `npm run docs-build` script is present, then it will be used instead of `npm run build` script.
 
 #### Pre-release versions publishing
 
