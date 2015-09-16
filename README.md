@@ -35,6 +35,37 @@ including `bower` publishing, for you - automatically.
 _Initial idea is got from `React-Bootstrap` release tools `./tools/release`,
 that have been written by [Matt Smith @mtscout6](https://github.com/mtscout6)_
 
+#### Publishing of built documents static pages
+
+If your project compiles static documentation pages (as e.g. `React-Boostrap` does)
+and needs to publish them to standalone repo / hosting (via `git push`),
+you can do it the same way the `bower` package releasing done.
+
+Just create additional github repo for your static documents site.
+
+E.g. [react-bootstrap.github.io.git](https://github.com/react-bootstrap/react-bootstrap.github.io)
+
+Add it as `'release-script'.docsRepo` into your `package.json`:
+```js
+"release-script": {
+  "docsRepo": "git@github.com:<author>/original-project-name-github.io.git"
+}
+```
+Default folders for documents are:
+- `"docsRoot": "docs-built"` folder where the documents files will be built (by your custom building scripts)
+- `"tmpDocsRepo": "tmp-docs-repo"` temporary folder.
+
+It is advised to add them both into `.gitignore`.
+
+You can customize them as you need:
+```js
+"release-script": {
+  "docsRepo": "git@github.com:<author>/original-project-name-github.io.git"
+  "docsRoot": "docs-built",
+  "tmpDocsRepo": "tmp-docs-repo"
+}
+```
+
 #### Pre-release versions publishing
 
 Say you need to publish pre-release `v0.25.100-pre.0` version
@@ -136,6 +167,8 @@ You can set a custom message for release via `--notes` CLI option:
   - then by `git add -A .` adds all bower distr files to the temporary git repo
   - commits, tags and pushes the same as for the `npm` package.
   - then deletes the `tmpBowerRepo` folder
+- id `docsRepo` field is present in the `package.json`, then it pushes builded documents to their repo.
+  It is done the same way as `bower` repo.
 
 ## Installation
 

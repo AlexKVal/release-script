@@ -39,6 +39,10 @@ const bowerRoot = path.join(repoRoot, (configOptions.bowerRoot || 'amd/'));
 const tmpBowerRepo = path.join(repoRoot, (configOptions.tmpBowerRepo || 'tmp-bower-repo'));
 const bowerRepo = configOptions.bowerRepo; // if it is not set, then there is no bower repo
 
+const docsRoot = path.join(repoRoot, (configOptions.docsRoot || 'docs-built/'));
+const tmpDocsRepo = path.join(repoRoot, (configOptions.tmpDocsRepo || 'tmp-docs-repo'));
+const docsRepo = configOptions.docsRepo; // if it is not set, then there is no docs/site repo
+
 const githubToken = process.env.GITHUB_TOKEN;
 
 const altPkgRootFolder = configOptions.altPkgRootFolder;
@@ -325,6 +329,13 @@ function release({ type, preid, npmTagName }) {
     console.log('Released: '.cyan + 'bower package'.green);
   } else {
     console.log('The "bowerRepo" is not set in package.json. Not publishing bower.'.yellow);
+  }
+
+  // documents site
+  if (!isPrivate && docsRepo) {
+    console.log('Releasing: '.cyan + 'documents site'.green);
+    releaseAdRepo(docsRepo, docsRoot, tmpDocsRepo, vVersion);
+    console.log('Documents site has been released'.green);
   }
 
   console.log('Version '.cyan + `v${newVersion}`.green + ' released!'.cyan);
