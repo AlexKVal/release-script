@@ -140,6 +140,28 @@ function getOwnerAndRepo(url) {
   return (gitUrlBase || url).split('/');
 }
 
+function releaseAdRepo(repo, srcFolder, tmpFolder, vVersion) {
+  if (!repo || !srcFolder || !tmpFolder || !vVersion) {
+    printErrorAndExit('Bug error. Create github issue: releaseAdRepo - One of parameters is not set.');
+  }
+
+  rm('-rf', tmpFolder);
+  run(`git clone ${repo} ${tmpFolder}`);
+  pushd(tmpFolder);
+  rm('-rf', ls(tmpFolder).filter(file => file !== '.git')); // delete all but `.git` dir
+  cp('-R', srcFolder, tmpFolder);
+  safeRun('git add -A .');
+  safeRun(`git commit -m "Release ${vVersion}"`);
+  safeRun(`git tag -a --message=${vVersion} ${vVersion}`);
+  safeRun('git push --follow-tags');
+  popd();
+  if (argv.dryRun) {
+    console.log(`[rm -rf ${tmpFolder}]`.grey, 'DRY RUN'.magenta);
+  } else {
+    rm('-rf', tmpFolder);
+  }
+}
+
 function release({ type, preid, npmTagName }) {
   if (type === undefined && !preid) printErrorAndExit('Must specify version type or preid');
 
@@ -299,21 +321,7 @@ function release({ type, preid, npmTagName }) {
     console.log('Package is private, skipping bower release'.yellow);
   } else if (bowerRepo) {
     console.log('Releasing: '.cyan + 'bower package'.green);
-    rm('-rf', tmpBowerRepo);
-    run(`git clone ${bowerRepo} ${tmpBowerRepo}`);
-    pushd(tmpBowerRepo);
-    rm('-rf', ls(tmpBowerRepo).filter(file => file !== '.git')); // delete all but `.git` dir
-    cp('-R', bowerRoot, tmpBowerRepo);
-    safeRun('git add -A .');
-    safeRun(`git commit -m "Release ${vVersion}"`);
-    safeRun(`git tag -a --message=${vVersion} ${vVersion}`);
-    safeRun('git push --follow-tags');
-    popd();
-    if (argv.dryRun) {
-      console.log(`[rm -rf ${tmpBowerRepo}]`.grey, 'DRY RUN'.magenta);
-    } else {
-      rm('-rf', tmpBowerRepo);
-    }
+    releaseAdRepo(bowerRepo, bowerRoot, tmpBowerRepo, vVersion);
     console.log('Released: '.cyan + 'bower package'.green);
   } else {
     console.log('The "bowerRepo" is not set in package.json. Not publishing bower.'.yellow);
