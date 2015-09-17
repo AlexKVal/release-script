@@ -14,9 +14,9 @@
     "build": "rm -rf lib && babel src --out-dir bin && chmod +x ./bin/release.js",
     "lint": "eslint .",
     "test": "npm run lint",
-    "patch": "bin/release.js patch",
-    "minor": "bin/release.js minor",
-    "major": "bin/release.js major"
+    "patch": "bin/release.js patch --run",
+    "minor": "bin/release.js minor --run",
+    "major": "bin/release.js major --run"
   },
   "repository": {
     "type": "git",
