@@ -99,7 +99,7 @@ const argv = yargsConf.argv;
 
 if (!argv.run) {
   console.log('DRY RUN'.magenta);
-  console.log('For actuall running of your command please add "--run" option'.yellow);
+  console.log('For actual running of your command please add "--run" option'.yellow);
 }
 if (argv.onlyDocs) console.log('Publish only documents'.magenta);
 
