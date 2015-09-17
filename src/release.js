@@ -52,17 +52,17 @@ const skipBuildStep = configOptions.skipBuildStep;
 //------------------------------------------------------------------------------
 // command line options
 const yargsConf = yargs
-  .usage('Usage: $0 <version> [--preid <identifier>]\nor\nUsage: $0 --only-docs')
-  .example('$0 minor --preid beta', 'Release with minor version bump with pre-release tag. (npm tag `beta`)')
-  .example('$0 major', 'Release with major version bump')
-  .example('$0 major --notes "This is new cool version"', 'Add a custom message to release')
-  .example('$0 major --dry-run', 'Release dry run with patch version bump')
-  .example('$0 --preid alpha', 'Release same version with pre-release bump. (npm tag `alpha`)')
-  .example('$0 0.101.0 --preid rc --tag canary', 'Release `v0.101.0-rc.0` pre-release version with npm tag `canary`')
-  .command('patch', 'Release patch')
-  .command('minor', 'Release minor')
-  .command('major', 'Release major')
-  .command('<version>', 'Release specific version')
+  .usage('Usage: $0 <version> --run [--preid <identifier>]\nor\nUsage: $0 --only-docs --run')
+  .example('$0 minor --preid beta --run', 'Release with minor version bump with pre-release tag. (npm tag `beta`)')
+  .example('$0 major --run', 'Release with major version bump')
+  .example('$0 major --notes "This is new cool version" --run', 'Add a custom message to release')
+  .example('$0 major', 'Without "--run" option it will dry run')
+  .example('$0 --preid alpha --run', 'Release same version with pre-release bump. (npm tag `alpha`)')
+  .example('$0 0.101.0 --preid rc --tag canary --run', 'Release `v0.101.0-rc.0` pre-release version with npm tag `canary`')
+  .command('patch --run', 'Release patch')
+  .command('minor --run', 'Release minor')
+  .command('major --run', 'Release major')
+  .command('<version> --run', 'Release specific version')
   .option('preid', {
     demand: false,
     describe: 'pre-release identifier',
@@ -79,11 +79,10 @@ const yargsConf = yargs
     default: false,
     describe: 'Publish only documents'
   })
-  .option('dry-run', {
-    alias: 'n',
+  .option('run', {
     demand: false,
     default: false,
-    describe: 'Execute command in dry run mode.\nWill not commit, tag, push, or publish anything.\nUserful for testing.'
+    describe: 'Actually execute command.'
   })
   .option('verbose', {
     demand: false,
@@ -98,7 +97,10 @@ const yargsConf = yargs
 
 const argv = yargsConf.argv;
 
-if (argv.dryRun) console.log('DRY RUN'.magenta);
+if (!argv.run) {
+  console.log('DRY RUN'.magenta);
+  console.log('For actuall running of your command please add "--run" option'.yellow);
+}
 if (argv.onlyDocs) console.log('Publish only documents'.magenta);
 
 config.silent = !argv.verbose;
@@ -132,7 +134,7 @@ function run(command) {
 }
 
 function safeRun(command) {
-  if (argv.dryRun) {
+  if (!argv.run) {
     console.log(`[${command}]`.grey, 'DRY RUN'.magenta);
   } else {
     return run(command);
@@ -140,7 +142,7 @@ function safeRun(command) {
 }
 
 function safeRm(...args) {
-  if (argv.dryRun) console.log(`[rm ${args.join(' ')}]`.grey, 'DRY RUN'.magenta);
+  if (!argv.run) console.log(`[rm ${args.join(' ')}]`.grey, 'DRY RUN'.magenta);
   else rm(args);
 }
 
@@ -302,7 +304,7 @@ function release({ type, preid, npmTagName }) {
       console.log(`GitHub token found ${githubToken}`.green);
       console.log('Publishing to GitHub: '.cyan + vVersion.green);
 
-      if (argv.dryRun) {
+      if (!argv.run) {
         console.log(`[publishing to GitHub]`.grey, 'DRY RUN'.magenta);
       } else {
         const [githubOwner, githubRepo] = getOwnerAndRepo(npmjson.repository.url || npmjson.repository);
