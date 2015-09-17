@@ -11,6 +11,14 @@ It prevents `danger` steps (`git push`, `npm publish` etc) from accidental runni
 
 **For actual running your command please add `--run` option.**
 
+*If you don't want this behavior you can add `"defaultDryRun": "false"` into your `package.json`.*
+```json
+"release-script": {
+  "defaultDryRun": "false"
+}
+```
+*Then you can use `--dry-run` option for checks.*
+
 ---
 
 #### Description
@@ -30,7 +38,7 @@ then name the `bower` github repo as
 `original-project-name-bower`.
 
 Add `'release-script'.bowerRepo` into your `package.json`:
-```js
+```json
 "release-script": {
   "bowerRepo": "git@github.com:<author>/original-project-name-bower.git"
 }
@@ -59,7 +67,7 @@ Just create additional github repo for your static documents site.
 E.g. [react-bootstrap.github.io.git](https://github.com/react-bootstrap/react-bootstrap.github.io)
 
 Add it as `'release-script'.docsRepo` into your `package.json`:
-```js
+```json
 "release-script": {
   "docsRepo": "git@github.com:<author>/original-project-name-github.io.git"
 }
@@ -71,7 +79,7 @@ Default folders for documents are:
 It is advised to add them both into `.gitignore`.
 
 You can customize them as you need:
-```js
+```json
 "release-script": {
   "docsRepo": "git@github.com:<author>/original-project-name-github.io.git"
   "docsRoot": "docs-built",
@@ -152,7 +160,7 @@ It is advised to add `bowerRoot` and `tmpBowerRepo` folders to your `.gitignore`
 All options are optional.
 
 E.g.:
-```js
+```json
 "release-script": {
   "bowerRepo": "git@github.com:<org-author-name>/<name-of-project>-bower.git",
   "bowerRoot": "amd",
@@ -220,7 +228,7 @@ If command line `--only-docs` option is set, then `github`, `npm` and `bower` pu
 ```
 
 If you need `bower` releases too, then add `'release-script'.bowerRepo` into your `package.json` like this:
-```js
+```json
 "release-script": {
   "bowerRepo": "git@github.com:<org-author-name>/<name-of-project>-bower.git"
 }
@@ -247,7 +255,7 @@ Or you just can install `release-script` globally.
 You also can add some helpful `script` commands to your `package.json`,
 and because `npm` adds `node_modules/.bin` into `PATH` for running scripts automatically,
 you can add them just like that:
-```js
+```json
 "scripts": {
     ...
     "patch": "release patch --run",
@@ -257,7 +265,7 @@ you can add them just like that:
 ```
 
 Also you can add it like this:
-```js
+```json
 "scripts": {
     ...
     "release": "release",

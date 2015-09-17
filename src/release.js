@@ -49,6 +49,8 @@ const altPkgRootFolder = configOptions.altPkgRootFolder;
 
 const skipBuildStep = configOptions.skipBuildStep;
 
+const defaultDryRun = configOptions.defaultDryRun !== 'false';
+
 //------------------------------------------------------------------------------
 // command line options
 const yargsConf = yargs
@@ -84,6 +86,12 @@ const yargsConf = yargs
     default: false,
     describe: 'Actually execute command.'
   })
+  .option('dry-run', {
+    alias: 'n',
+    demand: false,
+    default: false,
+    describe: 'With "defaultDryRun" option set this toggles "dry run" mode.'
+  })
   .option('verbose', {
     demand: false,
     default: false,
@@ -97,10 +105,15 @@ const yargsConf = yargs
 
 const argv = yargsConf.argv;
 
-if (!argv.run) {
-  console.log('DRY RUN'.magenta);
-  console.log('For actual running of your command please add "--run" option'.yellow);
+let dryRunMode = argv.dryRun || defaultDryRun;
+if (argv.run) {
+  dryRunMode = false;
 }
+if (dryRunMode) {
+  console.log('DRY RUN'.magenta);
+  if (defaultDryRun) console.log('For actual running of your command please add "--run" option'.yellow);
+}
+
 if (argv.onlyDocs) console.log('Publish only documents'.magenta);
 
 config.silent = !argv.verbose;
@@ -134,7 +147,7 @@ function run(command) {
 }
 
 function safeRun(command) {
-  if (!argv.run) {
+  if (dryRunMode) {
     console.log(`[${command}]`.grey, 'DRY RUN'.magenta);
   } else {
     return run(command);
@@ -142,7 +155,7 @@ function safeRun(command) {
 }
 
 function safeRm(...args) {
-  if (!argv.run) console.log(`[rm ${args.join(' ')}]`.grey, 'DRY RUN'.magenta);
+  if (dryRunMode) console.log(`[rm ${args.join(' ')}]`.grey, 'DRY RUN'.magenta);
   else rm(args);
 }
 
@@ -304,7 +317,7 @@ function release({ type, preid, npmTagName }) {
       console.log(`GitHub token found ${githubToken}`.green);
       console.log('Publishing to GitHub: '.cyan + vVersion.green);
 
-      if (!argv.run) {
+      if (dryRunMode) {
         console.log(`[publishing to GitHub]`.grey, 'DRY RUN'.magenta);
       } else {
         const [githubOwner, githubRepo] = getOwnerAndRepo(npmjson.repository.url || npmjson.repository);
