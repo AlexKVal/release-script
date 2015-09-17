@@ -2,6 +2,19 @@
 
 Release tool for npm and bower packages.
 
+
+---
+##### Human factor
+
+**Because of human nature to make mistakes, by default this script runs in `dry mode`.
+It prevents `danger` steps (`git push`, `npm publish` etc) from accidental running.**
+
+**For actual running your command please add `--run` option.**
+
+---
+
+#### Description
+
 With this tool there is no need to keep (transpiled) `lib`, `build`
 or `distr` files in the git repo.
 
@@ -69,7 +82,7 @@ You can customize them as you need:
 If you need to publish only documents (say with some minor fixes),
 this is as simple as:
 ```
-> release --only-docs
+> release --only-docs --run
 ```
 In this case the `package.json` version will be bumped with `--preid docs` as `0.10.0` => `0.10.0-docs.0`.
 
@@ -82,14 +95,14 @@ with the `canary` npm tag name (instead of default one `latest`).
 
 You can do it by this way:
 ```
-> release 0.25.100 --preid pre --tag canary
+> release 0.25.100 --preid pre --tag canary --run
 or
-> npm run release 0.25.100 -- --preid pre --tag canary
+> npm run release 0.25.100 -- --preid pre --tag canary --run
 ```
 
 If your `preid` tag and npm tag name are the same, then you can just:
 ```
-> release 0.25.100 --preid beta
+> release 0.25.100 --preid beta --run
 ```
 It will produce `v0.25.100-beta.0` and `npm publish --tag beta`.
 
@@ -162,7 +175,7 @@ export GITHUB_TOKEN="xxxxxxxxxxxx"
 ```
 You can set a custom message for release via `--notes` CLI option:
 ```
-> release patch --notes "This is small fix"
+> release patch --notes "This is small fix" --run
 ```
 
 
@@ -215,15 +228,9 @@ If you need `bower` releases too, then add `'release-script'.bowerRepo` into you
 
 Then you can release like that:
 ```sh
-> release patch
-> release minor --preid alpha
+> release patch --run
+> release minor --preid alpha --run
 ```
-
-You can use `--dry-run` option to check first what will be done and if it is OK.
-```sh
-> release major --dry-run --verbose
-```
-This option prevents `danger` steps from running. (`git push`, `npm publish` etc)
 
 If you don't have smth like that in your shell:
 ```sh
@@ -232,7 +239,7 @@ export PATH="./node_modules/.bin:$PATH"
 ```
 then you have to type the commands like this:
 ```sh
-> ./node_modules/.bin/release minor --preid alpha
+> ./node_modules/.bin/release minor --preid alpha --run
 ```
 
 Or you just can install `release-script` globally.
@@ -243,9 +250,10 @@ you can add them just like that:
 ```js
 "scripts": {
     ...
-    "patch": "release patch",
-    "minor": "release minor",
-    "major": "release major"
+    "patch": "release patch --run",
+    "minor": "release minor --run",
+    "major": "release major --run",
+    "release-dry-run": "release patch"
 ```
 
 Also you can add it like this:
@@ -256,9 +264,9 @@ Also you can add it like this:
 ```
 And then you can run it like that:
 ```
-> npm run release minor -- --preid alpha
-> npm run release patch -- --notes "This is small fix"
-> npm run release major -- --dry-run
+> npm run release minor -- --preid alpha --run
+> npm run release patch -- --notes "This is small fix --run"
+> npm run release major // for dry run
 etc
 ```
 _Notice: you have to add additional `--` before any `--option`. That way additional options will get straight to `release-script`._
