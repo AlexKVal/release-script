@@ -1,3 +1,10 @@
+v0.5.0 - Thu, 17 Sep 2015 06:11:16 GMT
+--------------------------------------
+
+- [57b2159](../../commit/57b2159) [changed] Now 'dry run' is default mode. To prevent accidental mistakes.
+
+
+
 v0.4.0 - Wed, 16 Sep 2015 17:07:17 GMT
 --------------------------------------
 
