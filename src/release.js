@@ -59,8 +59,9 @@ const yargsConf = yargs
   .example('$0 major --run', 'Release with major version bump')
   .example('$0 major --notes "This is new cool version" --run', 'Add a custom message to release')
   .example('$0 major', 'Without "--run" option it will dry run')
-  .example('$0 --preid alpha --run', 'Release same version with pre-release bump. (npm tag `alpha`)')
-  .example('$0 0.101.0 --preid rc --tag canary --run', 'Release `v0.101.0-rc.0` pre-release version with npm tag `canary`')
+  .example('$0 --preid alpha --run', 'Release the same version with pre-release bump. (npm tag `alpha`)')
+  .example('$0 0.101.0 --preid rc --tag canary --run', 'Publish `v0.101.0-rc.0` pre-release version with npm tag `canary`')
+  .example('$0 0.101.1 --preid rc --tag canary --no-docs --run', 'Publish pre-release without publishing of documents')
   .command('patch --run', 'Release patch')
   .command('minor --run', 'Release minor')
   .command('major --run', 'Release major')
@@ -80,6 +81,11 @@ const yargsConf = yargs
     demand: false,
     default: false,
     describe: 'Publish only documents'
+  })
+  .option('no-docs', {
+    demand: false,
+    default: false,
+    describe: 'Without documents'
   })
   .option('run', {
     demand: false,
@@ -106,6 +112,11 @@ const yargsConf = yargs
 const argv = yargsConf.argv;
 
 if (argv.onlyDocs) console.log('Publish only documents'.magenta);
+
+// because of 'yargs' specifics - argv.noDocs is present but it is set to 'false'
+// and we need just the fact of the `--no-docs` option presence
+const noDocsFlag = argv['no-docs'] !== undefined;
+if (noDocsFlag) console.log('Without publishing documents'.magenta);
 
 config.silent = !argv.verbose;
 
@@ -395,7 +406,7 @@ function release({ type, preid, npmTagName }) {
   }
 
   // documents site
-  if (!isPrivate && docsRepo) {
+  if (!isPrivate && !noDocsFlag && docsRepo) {
     console.log('Releasing: '.cyan + 'documents site'.green);
     releaseAdRepo(docsRepo, docsRoot, tmpDocsRepo, vVersion);
     console.log('Documents site has been released'.green);
