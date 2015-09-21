@@ -105,17 +105,6 @@ const yargsConf = yargs
 
 const argv = yargsConf.argv;
 
-let dryRunMode = argv.dryRun || defaultDryRun;
-if (argv.run) {
-  dryRunMode = false;
-}
-if (dryRunMode) {
-  console.log('DRY RUN'.magenta);
-  if (defaultDryRun) console.log('For actual running of your command please add "--run" option'.yellow);
-}
-
-if (argv.onlyDocs) console.log('Publish only documents'.magenta);
-
 config.silent = !argv.verbose;
 
 const versionBumpOptions = {
@@ -125,12 +114,24 @@ const versionBumpOptions = {
 };
 
 if (versionBumpOptions.type === undefined && versionBumpOptions.preid === undefined) {
-  console.log('Must provide either a version bump type, preid (or both)'.red);
+  console.log('Must provide either a version bump type, "preid" or "--only-docs"'.red);
   console.log(yargsConf.help());
   exit(1);
 }
 
 let notesForRelease = argv.notes;
+
+let dryRunMode = argv.dryRun || defaultDryRun;
+if (argv.run) {
+  dryRunMode = false;
+}
+if (dryRunMode) {
+  console.log('DRY RUN'.magenta);
+  if (defaultDryRun) console.log('For actual running of your command please add "--run" option'.yellow);
+}
+
+if (argv.preid) console.log('"--preid" detected. Documents will not be published'.yellow);
+if (argv.onlyDocs && !argv.preid) console.log('Publish only documents'.yellow);
 
 
 //------------------------------------------------------------------------------
