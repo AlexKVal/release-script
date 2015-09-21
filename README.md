@@ -96,6 +96,12 @@ In this case the `package.json` version will be bumped with `--preid docs` as `0
 
 If `npm run docs-build` script is present, then it will be used instead of `npm run build` script.
 
+Say you need to publish canary version but without documents site publishing,
+then just add `--no-docs` command line option:
+```
+> release 0.101.0 --preid rc --tag canary --no-docs
+```
+
 #### Pre-release versions publishing
 
 Say you need to publish pre-release `v0.25.100-pre.0` version
