@@ -105,15 +105,6 @@ const yargsConf = yargs
 
 const argv = yargsConf.argv;
 
-let dryRunMode = argv.dryRun || defaultDryRun;
-if (argv.run) {
-  dryRunMode = false;
-}
-if (dryRunMode) {
-  console.log('DRY RUN'.magenta);
-  if (defaultDryRun) console.log('For actual running of your command please add "--run" option'.yellow);
-}
-
 if (argv.onlyDocs) console.log('Publish only documents'.magenta);
 
 config.silent = !argv.verbose;
@@ -131,6 +122,15 @@ if (versionBumpOptions.type === undefined && versionBumpOptions.preid === undefi
 }
 
 let notesForRelease = argv.notes;
+
+let dryRunMode = argv.dryRun || defaultDryRun;
+if (argv.run) {
+  dryRunMode = false;
+}
+if (dryRunMode) {
+  console.log('DRY RUN'.magenta);
+  if (defaultDryRun) console.log('For actual running of your command please add "--run" option'.yellow);
+}
 
 
 //------------------------------------------------------------------------------
