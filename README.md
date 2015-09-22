@@ -96,6 +96,9 @@ In this case the `package.json` version will be bumped with `--preid docs` as `0
 
 If `npm run docs-build` script is present, then it will be used instead of `npm run build` script.
 
+*Note: Documents are not published with pre-release version,
+(i.e. when you run it with `--preid` option).*
+
 #### Pre-release versions publishing
 
 Say you need to publish pre-release `v0.25.100-pre.0` version

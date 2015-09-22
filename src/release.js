@@ -395,7 +395,7 @@ function release({ type, preid, npmTagName }) {
   }
 
   // documents site
-  if (!isPrivate && docsRepo) {
+  if (!isPrivate && !preid && docsRepo) {
     console.log('Releasing: '.cyan + 'documents site'.green);
     releaseAdRepo(docsRepo, docsRoot, tmpDocsRepo, vVersion);
     console.log('Documents site has been released'.green);
