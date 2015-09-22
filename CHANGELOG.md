@@ -1,3 +1,10 @@
+v0.5.3 - Tue, 22 Sep 2015 15:15:59 GMT
+--------------------------------------
+
+- [aef3379](../../commit/aef3379) [fixed] do not publish documents with '--preid' option
+
+
+
 v0.5.2 - Thu, 17 Sep 2015 10:51:11 GMT
 --------------------------------------
 
