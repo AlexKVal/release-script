@@ -56,6 +56,8 @@ including `bower` publishing, for you - automatically.
 _Initial idea is got from `React-Bootstrap` release tools `./tools/release`,
 that have been written by [Matt Smith @mtscout6](https://github.com/mtscout6)_
 
+_Kind of "migration manual"_ https://github.com/AlexKVal/release-script/issues/23
+
 #### Documents pages publishing
 
 If your project compiles static documentation pages (as e.g. `React-Boostrap` does)
