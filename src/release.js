@@ -23,7 +23,7 @@ const devDepsNode = npmjson.devDependencies;
 //------------------------------------------------------------------------------
 // check if one of 'rf-changelog' or 'mt-changelog' is used by project
 let isCommitsChangelogUsed = devDepsNode &&
-  devDepsNode['rf-changelog'] || devDepsNode['mt-changelog'];
+  (devDepsNode['rf-changelog'] || devDepsNode['mt-changelog']);
 if (isCommitsChangelogUsed && !which('changelog')) {
   printErrorAndExit('The "[rf|mt]-changelog" package is present in "devDependencies", but it is not installed.');
 }
