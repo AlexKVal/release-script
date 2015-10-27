@@ -83,7 +83,7 @@ It is advised to add them both into `.gitignore`.
 You can customize them as you need:
 ```json
 "release-script": {
-  "docsRepo": "git@github.com:<author>/original-project-name-github.io.git"
+  "docsRepo": "git@github.com:<author>/original-project-name-github.io.git",
   "docsRoot": "docs-built",
   "tmpDocsRepo": "tmp-docs-repo"
 }
