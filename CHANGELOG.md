@@ -1,3 +1,10 @@
+v0.5.5 - Thu, 19 Nov 2015 07:34:10 GMT
+--------------------------------------
+
+- [8a5c227](../../commit/8a5c227) [fixed] checking that a local repo is behind the remote
+
+
+
 v0.5.4 - Fri, 16 Oct 2015 22:20:44 GMT
 --------------------------------------
 
