@@ -214,7 +214,8 @@ function release({ type, preid, npmTagName }) {
   console.info('No pending changes'.cyan);
 
   // ensure git repo last version is fetched
-  if (/\[behind (.*)\]/.test(exec('git fetch').output)) {
+  exec('git fetch');
+  if (/behind (.*)\]/.test(exec('git status -sb').output)) {
     printErrorAndExit(`Your repo is behind by ${RegExp.$1} commits`);
   }
   console.info('Current with latest changes from remote'.cyan);
