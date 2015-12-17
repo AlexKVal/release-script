@@ -257,7 +257,7 @@ function release({ type, preid, npmTagName }) {
     runAndGitRevertOnError('npm run docs-build');
     console.log('Completed: '.cyan + 'docs-build'.green);
   } else {
-    if (npmjson.scripts.build && !skipBuildStep) {
+    if (npmjson.scripts && npmjson.scripts.build && !skipBuildStep) {
       console.log('Running: '.cyan + 'build'.green);
       runAndGitRevertOnError('npm run build');
       console.log('Completed: '.cyan + 'build'.green);
