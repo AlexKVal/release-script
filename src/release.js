@@ -61,6 +61,7 @@ const yargsConf = yargs
   .example('$0 major', 'Without "--run" option it will dry run')
   .example('$0 --preid alpha --run', 'Release same version with pre-release bump. (npm tag `alpha`)')
   .example('$0 0.101.0 --preid rc --tag canary --run', 'Release `v0.101.0-rc.0` pre-release version with npm tag `canary`')
+  .example('$0 ... --skip-test(s)', 'Use this flag in case you need to skip `npm run test` step.')
   .command('patch --run', 'Release patch')
   .command('minor --run', 'Release minor')
   .command('major --run', 'Release major')
@@ -96,6 +97,12 @@ const yargsConf = yargs
     demand: false,
     default: false,
     describe: 'Increased debug output'
+  })
+  .option('skip-tests', {
+    alias: 'skip-test',
+    demand: false,
+    default: false,
+    describe: 'Skip `npm run test` step'
   })
   .option('notes', {
     demand: false,
@@ -242,29 +249,33 @@ function release({ type, preid, npmTagName }) {
   console.log('Version changed from '.cyan + oldVersion.green + ' to '.cyan + newVersion.green);
   safeRun('git add package.json');
 
-  // npm run test
-  // this step is placed after version bumping
-  // for the case when documents are been built in "npm run test" script
-  console.log('Running: '.cyan + '"npm run test"'.green);
-  config.silent = !skipBuildStep;
-  runAndGitRevertOnError('npm run test');
-  config.silent = !argv.verbose;
-  console.log('Completed: '.cyan + '"npm run test"'.green);
-
-  // npm run build
-  if (argv.onlyDocs && docsBuild) {
-    console.log('Running: '.cyan + 'docs-build'.green);
-    runAndGitRevertOnError('npm run docs-build');
-    console.log('Completed: '.cyan + 'docs-build'.green);
-  } else {
-    if (npmjson.scripts && npmjson.scripts.build && !skipBuildStep) {
-      console.log('Running: '.cyan + 'build'.green);
-      runAndGitRevertOnError('npm run build');
-      console.log('Completed: '.cyan + 'build'.green);
-    } else {
-      console.log('Skipping "npm run build" step.'.yellow);
+  if (npmjson.scripts) { // do not throw if there are no 'scripts' at all
+    if (npmjson.scripts.test && !argv.skipTests) {
+      // npm run test
+      // this step is placed after version bumping
+      // for the case when documents are been built in "npm run test" script
+      console.log('Running: '.cyan + '"npm run test"'.green);
+      config.silent = !skipBuildStep;
+      runAndGitRevertOnError('npm run test');
+      config.silent = !argv.verbose;
+      console.log('Completed: '.cyan + '"npm run test"'.green);
     }
-  }
+
+    // npm run build
+    if (argv.onlyDocs && docsBuild) {
+      console.log('Running: '.cyan + 'docs-build'.green);
+      runAndGitRevertOnError('npm run docs-build');
+      console.log('Completed: '.cyan + 'docs-build'.green);
+    } else {
+      if (npmjson.scripts.build && !skipBuildStep) {
+        console.log('Running: '.cyan + 'build'.green);
+        runAndGitRevertOnError('npm run build');
+        console.log('Completed: '.cyan + 'build'.green);
+      } else {
+        console.log('Skipping "npm run build" step.'.yellow);
+      }
+    }
+  } // if (npmjson.scripts)
 
   const vVersion = `v${newVersion}`;
   const versionAndNotes = notesForRelease = notesForRelease ? `${vVersion} ${notesForRelease}` : vVersion;
