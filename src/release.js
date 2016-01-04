@@ -54,63 +54,48 @@ const defaultDryRun = configOptions.defaultDryRun !== 'false';
 //------------------------------------------------------------------------------
 // command line options
 const yargsConf = yargs
-  .usage('Usage: $0 <version> --run [--preid <identifier>]\nor\nUsage: $0 --only-docs --run')
-  .example('$0 minor --preid beta --run', 'Release with minor version bump with pre-release tag. (npm tag `beta`)')
-  .example('$0 major --run', 'Release with major version bump')
-  .example('$0 major --notes "This is new cool version" --run', 'Add a custom message to release')
-  .example('$0 major', 'Without "--run" option it will dry run')
-  .example('$0 --preid alpha --run', 'Release same version with pre-release bump. (npm tag `alpha`)')
-  .example('$0 0.101.0 --preid rc --tag canary --run', 'Release `v0.101.0-rc.0` pre-release version with npm tag `canary`')
-  .example('$0 ... --skip-test(s)', 'Use this flag in case you need to skip `npm run test` step.')
-  .command('patch --run', 'Release patch')
-  .command('minor --run', 'Release minor')
-  .command('major --run', 'Release major')
-  .command('<version> --run', 'Release specific version')
+  .usage('Usage: $0 <version> [--preid <identifier>]\nor\nUsage: $0 --only-docs')
+  .example('$0 minor --preid beta', 'Release with a minor version bump and a pre-release tag. (npm tag `beta`)')
+  .example('$0 major', 'Release with a major version bump')
+  .example('$0 major --notes "a custom message text"', 'Add a custom message to the release')
+  .example('$0 --preid alpha', 'Release the same version with a pre-release tag. (npm tag `alpha`)')
+  .example('$0 0.101.0 --preid rc --tag canary', 'Release pre-release version `v0.101.0-rc.0` with npm tag `canary`')
+  .example('$0 ... --skip-test(s)', 'Use this flag if you need to skip `npm run test` step.')
+  .command('patch', 'Release patch')
+  .command('minor', 'Release minor')
+  .command('major', 'Release major')
+  .command('<version>', 'Release arbitrary version number')
   .option('preid', {
-    demand: false,
     describe: 'pre-release identifier',
     type: 'string'
   })
   .option('tag', {
-    demand: false,
-    describe: 'Npm tag name for the pre-release version.\nIf it is not provided, then `preid` value is used',
+    describe: 'Npm tag name for pre-release version.\nIf it is not provided, then `preid` value is used',
     type: 'string'
   })
   .option('only-docs', {
     alias: 'docs',
-    demand: false,
-    default: false,
     describe: 'Publish only documents'
   })
   .option('run', {
-    demand: false,
-    default: false,
-    describe: 'Actually execute command.'
+    describe: 'Actually execute command'
   })
   .option('dry-run', {
     alias: 'n',
-    demand: false,
-    default: false,
-    describe: 'With "defaultDryRun" option set this toggles "dry run" mode.'
+    describe: 'With "defaultDryRun" option set this toggles "dry run" mode'
   })
   .option('verbose', {
-    demand: false,
-    default: false,
     describe: 'Increased debug output'
   })
   .option('skip-tests', {
     alias: 'skip-test',
-    demand: false,
-    default: false,
     describe: 'Skip `npm run test` step'
   })
   .option('skip-version-bumping', {
     describe: 'Skip version bumping step'
   })
   .option('notes', {
-    demand: false,
-    default: false,
-    describe: 'A custom message for release.\nOverrides [rf|mt]changelog message'
+    describe: 'A custom message for the release.\nOverrides [rf|mt]changelog message'
   });
 
 const argv = yargsConf.argv;
@@ -137,7 +122,11 @@ if (argv.run) {
 }
 if (dryRunMode) {
   console.log('DRY RUN'.magenta);
-  if (defaultDryRun) console.log('For actual running of your command please add "--run" option'.yellow);
+  if (defaultDryRun) {
+    console.log('------------------------------------------------------');
+    console.log('To actually run your command please add "--run" option'.yellow);
+    console.log('------------------------------------------------------');
+  }
 }
 
 if (argv.preid) console.log('"--preid" detected. Documents will not be published'.yellow);
@@ -314,7 +303,7 @@ function release({ type, preid, npmTagName }) {
       safeRun(`git add -A ${changelogAlpha}`);
     }
 
-    console.log('Generated Changelog'.cyan);
+    console.log('The changelog has been generated'.cyan);
   }
 
   safeRun(`git commit -m "Release ${vVersion}"`);
@@ -360,10 +349,10 @@ function release({ type, preid, npmTagName }) {
           if (err) {
             console.log('API request to GitHub, error has occured:'.red);
             console.log(err);
-            console.log('Skip GitHub releasing'.yellow);
+            console.log('Skipping GitHub releasing'.yellow);
           } else if (res.statusMessage === 'Unauthorized') {
             console.log(`GitHub token ${githubToken} is wrong`.red);
-            console.log('Skip GitHub releasing'.yellow);
+            console.log('Skipping GitHub releasing'.yellow);
           } else {
             console.log(`Published at ${body.html_url}`.green);
           }
@@ -409,7 +398,7 @@ function release({ type, preid, npmTagName }) {
       releaseAdRepo(bowerRepo, bowerRoot, tmpBowerRepo, vVersion);
       console.log('Released: '.cyan + 'bower package'.green);
     } else {
-      console.log('The "bowerRepo" is not set in package.json. Not publishing bower.'.yellow);
+      console.log('The "bowerRepo" is not set in package.json. Skipping Bower package publishing.'.yellow);
     }
   }
 
