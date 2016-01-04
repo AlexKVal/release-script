@@ -104,6 +104,9 @@ const yargsConf = yargs
     default: false,
     describe: 'Skip `npm run test` step'
   })
+  .option('skip-version-bumping', {
+    describe: 'Skip version bumping step'
+  })
   .option('notes', {
     demand: false,
     default: false,
@@ -120,7 +123,7 @@ const versionBumpOptions = {
   npmTagName: argv.tag || argv.preid
 };
 
-if (versionBumpOptions.type === undefined && versionBumpOptions.preid === undefined) {
+if (!argv.skipVersionBumping && versionBumpOptions.type === undefined && versionBumpOptions.preid === undefined) {
   console.log('Must provide either a version bump type, "preid" or "--only-docs"'.red);
   console.log(yargsConf.help());
   exit(1);
@@ -212,8 +215,6 @@ function releaseAdRepo(repo, srcFolder, tmpFolder, vVersion) {
 }
 
 function release({ type, preid, npmTagName }) {
-  if (type === undefined && !preid) printErrorAndExit('Must specify version type or preid');
-
   // ensure git repo has no pending changes
   if (exec('git diff-index --name-only HEAD --').output.length) {
     printErrorAndExit('Git repository must be clean');
@@ -227,27 +228,32 @@ function release({ type, preid, npmTagName }) {
   }
   console.info('Current with latest changes from remote'.cyan);
 
-  // version bump
+  // version bumping
   const oldVersion = npmjson.version;
   let newVersion;
 
-  if (type === undefined) {
-    newVersion = oldVersion; // --preid
-  } else if (['major', 'minor', 'patch'].indexOf(type) >= 0) {
-    newVersion = semver.inc(oldVersion, type);
+  if (argv.skipVersionBumping) {
+    newVersion = oldVersion;
+    console.log('The version remains the same '.yellow + oldVersion.green);
   } else {
-    newVersion = type; // '<version>', 'Release specific version'
+    if (type === undefined) {
+      newVersion = oldVersion; // --preid
+    } else if (['major', 'minor', 'patch'].indexOf(type) >= 0) {
+      newVersion = semver.inc(oldVersion, type);
+    } else {
+      newVersion = type; // '<version>', 'Release specific version'
+    }
+
+    if (preid) {
+      newVersion = semver.inc(newVersion, 'pre', preid);
+    }
+
+    npmjson.version = newVersion;
+    `${JSON.stringify(npmjson, null, 2)}\n`.to(packagePath);
+
+    console.log('The version changed from '.cyan + oldVersion.green + ' to '.cyan + newVersion.green);
+    safeRun('git add package.json');
   }
-
-  if (preid) {
-    newVersion = semver.inc(newVersion, 'pre', preid);
-  }
-
-  npmjson.version = newVersion;
-  `${JSON.stringify(npmjson, null, 2)}\n`.to(packagePath);
-
-  console.log('Version changed from '.cyan + oldVersion.green + ' to '.cyan + newVersion.green);
-  safeRun('git add package.json');
 
   if (npmjson.scripts) { // do not throw if there are no 'scripts' at all
     if (npmjson.scripts.test && !argv.skipTests) {
