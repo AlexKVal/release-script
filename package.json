@@ -48,6 +48,7 @@
   },
   "dependencies": {
     "colors": "^1.1.2",
+    "github-url-to-object": "^2.1.0",
     "request": "^2.60.0",
     "semver": "^5.0.0",
     "shelljs": "^0.5.1",
