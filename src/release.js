@@ -7,6 +7,7 @@ import path from 'path';
 import semver from 'semver';
 import yargs from 'yargs';
 import request from 'request';
+import gh from 'github-url-to-object';
 
 // do not die on errors
 config.fatal = false;
@@ -15,8 +16,10 @@ config.fatal = false;
 // constants
 const repoRoot = pwd();
 const packagePath = path.join(repoRoot, 'package.json');
+const bowerjsonPath = path.join(repoRoot, 'bower.json');
 
 const npmjson = JSON.parse(cat(packagePath));
+const bowerjson = test('-f', bowerjsonPath) ? JSON.parse(cat(bowerjsonPath)) : null;
 const isPrivate = npmjson.private;
 const devDepsNode = npmjson.devDependencies;
 
@@ -140,17 +143,17 @@ function printErrorAndExit(error) {
   exit(1);
 }
 
-function run(command) {
+function run(command, skipError) {
   const { code, output } = exec(command);
-  if (code !== 0) printErrorAndExit(output);
+  if (code !== 0 && !skipError) printErrorAndExit(output);
   return output;
 }
 
-function safeRun(command) {
+function safeRun(command, skipError) {
   if (dryRunMode) {
     console.log(`[${command}]`.grey, 'DRY RUN'.magenta);
   } else {
-    return run(command);
+    return run(command, skipError);
   }
 }
 
@@ -320,6 +323,8 @@ function release({ type, preid, npmTagName }) {
   console.log('Tagged: '.cyan + vVersion.green);
 
   if (!argv.onlyDocs) {
+    const repo = npmjson.repository.url || npmjson.repository;
+
     // publish to GitHub
     if (githubToken) {
       console.log(`GitHub token found ${githubToken}`.green);
@@ -328,7 +333,7 @@ function release({ type, preid, npmTagName }) {
       if (dryRunMode) {
         console.log(`[publishing to GitHub]`.grey, 'DRY RUN'.magenta);
       } else {
-        const [githubOwner, githubRepo] = getOwnerAndRepo(npmjson.repository.url || npmjson.repository);
+        const [githubOwner, githubRepo] = getOwnerAndRepo(repo);
 
         request({
           uri: `https://api.github.com/repos/${githubOwner}/${githubRepo}/releases`,
@@ -389,8 +394,7 @@ function release({ type, preid, npmTagName }) {
 
       console.log('Released: '.cyan + 'npm package'.green);
     }
-
-    // bower
+    // bower (separate repo)
     if (isPrivate) {
       console.log('Package is private, skipping bower release'.yellow);
     } else if (bowerRepo) {
@@ -399,6 +403,27 @@ function release({ type, preid, npmTagName }) {
       console.log('Released: '.cyan + 'bower package'.green);
     } else {
       console.log('The "bowerRepo" is not set in package.json. Skipping Bower package publishing.'.yellow);
+    }
+    // bower (register package if bower.json is located in this repo)
+    if (bowerjson) {
+      if (bowerjson.private) {
+        console.log('Package is private, skipping bower registration'.yellow);
+      } else if (!which('bower')) {
+        console.log('Bower is not installed globally, skipping bower registration'.yellow);
+      } else {
+        console.log('Registering: '.cyan + 'bower package'.green);
+
+        const output = safeRun(`bower register ${bowerjson.name} ${gh(repo).clone_url}`, true);
+
+        if (output.indexOf('EDUPLICATE') > -1) {
+          console.log('Package already registered'.yellow);
+        } else if (output.indexOf('registered successfully') < 0) {
+          console.log('Error registering package, details:'.red);
+          console.log(output.red);
+        } else {
+          console.log('Registered: '.cyan + 'bower package'.green);
+        }
+      }
     }
   }
 
