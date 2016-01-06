@@ -42,7 +42,7 @@
     "babel-eslint": "^4.0.5",
     "babel-preset-es2015": "^6.0.15",
     "eslint": "^1.0.0",
-    "eslint-config-airbnb": "^0.1.0",
+    "eslint-config-airbnb": "^3.0.0",
     "eslint-plugin-react": "^3.3.2",
     "mt-changelog": "^0.6.1"
   },
