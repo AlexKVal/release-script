@@ -2,6 +2,7 @@
 
 Release tool for npm and bower packages.
 
+[![Build Status](https://travis-ci.org/AlexKVal/release-script.svg)](https://travis-ci.org/AlexKVal/release-script)
 
 ---
 ##### Human factor

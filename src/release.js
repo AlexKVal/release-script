@@ -347,10 +347,10 @@ function release({ type, preid, npmTagName }) {
             prerelease: !!preid
           },
           headers: {
-            'Authorization': `token ${githubToken}`,
+            Authorization: `token ${githubToken}`,
             'User-Agent': 'release-script (https://github.com/alexkval/release-script)'
           }
-        }, function(err, res, body) {
+        }, function (err, res, body) {
           if (err) {
             console.log('API request to GitHub, error has occured:'.red);
             console.log(err);
