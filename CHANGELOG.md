@@ -1,3 +1,10 @@
+v0.5.8 - Wed, 06 Jan 2016 17:01:45 GMT
+--------------------------------------
+
+- [2229dbd](../../commit/2229dbd) [added] automatic registration of package if bower.json is located in the repository
+
+
+
 v0.5.7 - Mon, 04 Jan 2016 12:10:23 GMT
 --------------------------------------
 
