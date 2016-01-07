@@ -11,7 +11,7 @@
     "bin"
   ],
   "scripts": {
-    "build": "rm -rf bin && babel src --out-dir bin && chmod +x ./bin/release.js",
+    "build": "rimraf bin && babel src --out-dir bin",
     "lint": "eslint .",
     "test": "npm run lint",
     "patch": "bin/release.js patch --run",
@@ -44,7 +44,8 @@
     "eslint": "^1.0.0",
     "eslint-config-airbnb": "^3.0.0",
     "eslint-plugin-react": "^3.3.2",
-    "mt-changelog": "^0.6.1"
+    "mt-changelog": "^0.6.1",
+    "rimraf": "^2.5.0"
   },
   "dependencies": {
     "colors": "^1.1.2",
