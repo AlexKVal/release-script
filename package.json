@@ -14,9 +14,9 @@
     "build": "rimraf bin && babel src --out-dir bin",
     "lint": "eslint .",
     "test": "npm run lint",
-    "patch": "bin/release.js patch --run",
-    "minor": "bin/release.js minor --run",
-    "major": "bin/release.js major --run"
+    "patch": "node bin/release.js patch",
+    "minor": "node bin/release.js minor",
+    "major": "node bin/release.js major"
   },
   "repository": {
     "type": "git",
