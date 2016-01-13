@@ -5,23 +5,6 @@ Release tool for npm and bower packages.
 [![Build Status](https://travis-ci.org/AlexKVal/release-script.svg)](https://travis-ci.org/AlexKVal/release-script)
 
 ---
-##### Human factor
-
-**Because of human nature to make mistakes, by default this script runs in `dry mode`.
-It prevents `danger` steps (`git push`, `npm publish` etc) from accidental running.**
-
-**For actual running your command please add `--run` option.**
-
-*If you don't want this behavior you can add `"defaultDryRun": "false"` into your `package.json`.*
-```json
-"release-script": {
-  "defaultDryRun": "false"
-}
-```
-*Then you can use `--dry-run` option for checks.*
-
----
-
 #### Description
 
 With this tool there is no need to keep (transpiled) `lib`, `build`
@@ -59,13 +42,10 @@ that have been written by [Matt Smith @mtscout6](https://github.com/mtscout6)_
 
 _Kind of "migration manual"_ https://github.com/AlexKVal/release-script/issues/23
 
-#### Documents pages publishing
+#### Documentation pages publishing
 
-If your project compiles static documentation pages (as e.g. `React-Boostrap` does)
-and needs to publish them to standalone repo / hosting (via `git push`),
-you can do it the same way the `bower` package releasing done.
-
-Just create additional github repo for your static documents site.
+If your project generates static documentation pages (as `React-Boostrap` does)
+and needs publishing them to a standalone repo (via `git push`), just create additional github repo for the documentation pages.
 
 E.g. [react-bootstrap.github.io.git](https://github.com/react-bootstrap/react-bootstrap.github.io)
 
@@ -75,9 +55,9 @@ Add it as `'release-script'.docsRepo` into your `package.json`:
   "docsRepo": "git@github.com:<author>/original-project-name-github.io.git"
 }
 ```
-Default folders for documents are:
-- `"docsRoot": "docs-built"` folder where the documents files will be built (by your custom building scripts)
-- `"tmpDocsRepo": "tmp-docs-repo"` temporary folder.
+Default folders for documentation pages are:
+- `"docsRoot": "docs-built"` folder where the files will be built to. (by your custom building script)
+- `"tmpDocsRepo": "tmp-docs-repo"` temporary folder. (for the release-script usage)
 
 It is advised to add them both into `.gitignore`.
 
@@ -90,16 +70,16 @@ You can customize them as you need:
 }
 ```
 
-If you need to publish only documents (say with some minor fixes),
-this is as simple as:
+If you need to publish only documentation pages (say with some minor fixes),
+you can do it this way:
 ```
-> release --only-docs --run
+> release --only-docs
 ```
 In this case the `package.json` version will be bumped with `--preid docs` as `0.10.0` => `0.10.0-docs.0`.
 
 If `npm run docs-build` script is present, then it will be used instead of `npm run build` script.
 
-*Note: Documents are not published with pre-release version,
+*Note: Documentation pages are not published when you are releasing "pre-release" version,
 (i.e. when you run it with `--preid` option).*
 
 #### Pre-release versions publishing
@@ -107,16 +87,16 @@ If `npm run docs-build` script is present, then it will be used instead of `npm 
 Say you need to publish pre-release `v0.25.100-pre.0` version
 with the `canary` npm tag name (instead of default one `latest`).
 
-You can do it by this way:
+You can do it this way:
 ```
-> release 0.25.100 --preid pre --tag canary --run
+> release 0.25.100 --preid pre --tag canary
 or
-> npm run release 0.25.100 -- --preid pre --tag canary --run
+> npm run release 0.25.100 -- --preid pre --tag canary
 ```
 
-If your `preid` tag and npm tag name are the same, then you can just:
+If your `preid` tag and npm tag are the same, then you can just:
 ```
-> release 0.25.100 --preid beta --run
+> release 0.25.100 --preid beta
 ```
 It will produce `v0.25.100-beta.0` and `npm publish --tag beta`.
 
@@ -125,8 +105,8 @@ and with the next release this file will be removed.
 
 #### Alternative npm package root folder
 
-Say you want to publish to `npmjs` only the content of your `lib` folder.
-Then you can do it as simple as adding this option to your `package.json`
+Say you want to publish the content of your `lib` folder as an npm package's root folder.
+Then you can do it as simple as adding the following to your `package.json`
 ```json
 "release-script": {
   "altPkgRootFolder": "lib"
@@ -142,7 +122,7 @@ If you run building scripts within your `npm run test` step, e.g.
   "test": "npm run lint && npm run build && npm run tests-set",
 }
 ```
-then you can disable superfluous `npm run build` step running
+then you can prevent `npm run build` step from running
 by setting `'release-script'.skipBuildStep` option:
 ```json
 "release-script": {
@@ -159,13 +139,11 @@ All options for this package are kept under `'release-script'` node in your proj
   - `default` value: `'amd'`
 - `tmpBowerRepo` - the folder name for temporary files for bower pkg.
   - `default` value: `'tmp-bower-repo'`
-- `altPkgRootFolder` - the folder name for alternative npm package root folder
+- `altPkgRootFolder` - the folder name for alternative npm package's root folder
 
 It is advised to add `bowerRoot` and `tmpBowerRepo` folders to your `.gitignore` file.
 
-All options are optional.
-
-E.g.:
+Example:
 ```json
 "release-script": {
   "bowerRepo": "git@github.com:<org-author-name>/<name-of-project>-bower.git",
@@ -177,55 +155,52 @@ E.g.:
 
 #### GitHub releases
 
-If you want this script to publish github releases,
-you can generate token https://github.com/settings/tokens for it
-and set `env.GITHUB_TOKEN` to it like this:
+If you need this script to publish github releases,
+you can generate a github token at https://github.com/settings/tokens
+and put it to `env.GITHUB_TOKEN` this way:
 ```sh
 > GITHUB_TOKEN="xxxxxxxxxxxx" && release-script patch
 ```
-or through your shell scripts
+or into your shell scripts
 ```sh
 export GITHUB_TOKEN="xxxxxxxxxxxx"
 ```
-You can set a custom message for release via `--notes` CLI option:
+You can set a custom message for github release via `--notes` CLI option:
 ```
-> release patch --notes "This is small fix" --run
+> release patch --notes "This is a small fix"
 ```
 
 
-#### This script does following steps:
+#### This script does the following steps:
 
 - ensures that git repo has no pending changes
-- ensures that git repo last version is fetched
+- ensures that the latest version is fetched
 - checks linting and tests by running `npm run test` command
-- does version bump, with `preid` if it is requested
+- does version bumping
 - builds all by running `npm run build` command
   - If there is no `build` script, then `release-script` just skips the `build` step.
-- if one of `[rf|mt]-changelog` is used in 'devDependencies', then changelog is generated
-- adds and commits changed `package.json` (and `CHANGELOG.md`, if used) files to git repo
-- adds git tag with new version (and changelog message, if used)
+- if one of `[rf|mt]-changelog` is used in 'devDependencies', then changelog is to be generated
+- adds and commits `package.json` with changed version and `CHANGELOG.md` if it's used
+- adds git tag with new version and changelog message if it's used
 - pushes changes to github repo
-- if github token is present, publishes release to GitHub, named as `<repo> vx.x.x`
-- if `--preid` tag set, then `npm publish --tag` command for npm publishing is used
-  - through `--tag` one can set `npm tag name` for the pre-release version (e.g. `alpha` or `canary`)
-  - othewise `--preid` value will be used
-- if `altPkgRootFolder` doesn't set it will just `npm publish [--tag]` as usual
-  - otherwise if `altPkgRootFolder` set then this script
-    - will `npm publish [--tag]` from the `altPkgRootFolder` folder
-    - with the custom version of `package.json` with removed `scripts` and `devDependencies`
-    - also it will remove the `altPkgRootFolder` part from the `main` file path
-- if `bowerRepo` field is present in the `package.json`, then it releases bower package:
-  - clones bower repo to local `tmpBowerRepo` temp folder. `git clone bowerRepo tmpBowerRepo`
-  - then it cleans up all but `.git` files in the `tmpBowerRepo`
-  - then copies all files from `bowerRoot` to `tmpBowerRepo`
-    - (that has to be generated with `npm run build`)
-  - then by `git add -A .` adds all bower distr files to the temporary git repo
-  - commits, tags and pushes the same as for the `npm` package.
-  - then deletes the `tmpBowerRepo` folder
-- id `docsRepo` field is present in the `package.json`, then it pushes builded documents to their repo.
-  It is done the same way as `bower` repo.
+- if github token is present the script publishes the release to the GitHub
+- if `--preid` tag set then `npm publish --tag` command for npm publishing is used
+  - with `--tag` option one can set `npm tag name` for a pre-release version (e.g. `alpha` or `canary`)
+  - otherwise `--preid` value will be used
+- if `altPkgRootFolder` isn't set it will just `npm publish [--tag]` as usual. Otherwise:
+  - the release-script will `npm publish [--tag]` from the inside `altPkgRootFolder` folder
+  - `scripts` and `devDependencies` will be removed from `package.json`
+- if `bowerRepo` field is present in the `package.json` then bower package will be released.
+  - the script will clone the bower repo to the `tmpBowerRepo` folder
+  - clean up all files but `.git` in the `tmpBowerRepo` folder
+  - copy all files from `bowerRoot` to `tmpBowerRepo` (they has to be generated by `npm run build`)
+  - add all files to the temporary git repo with `git add -A .`
+  - then it will commit, tag and push. The same as for the `npm` package.
+  - and at the end it will remove the `tmpBowerRepo` folder
+- if `docsRepo` option is set then documentation pages are being pushed to their repo.
+  It is done the same way as `bower` publishing process.
 
-If command line `--only-docs` option is set, then `github`, `npm` and `bower` publishing steps will be skipped.
+If `--only-docs` command line option is set then `github`, `npm` and `bower` publishing steps will be skipped.
 
 ## Installation
 
@@ -233,57 +208,54 @@ If command line `--only-docs` option is set, then `github`, `npm` and `bower` pu
 > npm install -D release-script
 ```
 
-If you need `bower` releases too, then add `'release-script'.bowerRepo` into your `package.json` like this:
+If you need `bower` releases too then add `'release-script'.bowerRepo` into your `package.json`:
 ```json
 "release-script": {
   "bowerRepo": "git@github.com:<org-author-name>/<name-of-project>-bower.git"
 }
 ```
 
-Then you can release like that:
-```sh
-> release patch --run
-> release minor --preid alpha --run
-```
-
-If you don't have smth like that in your shell:
+If you have smth like that in your shell:
 ```sh
 # npm
 export PATH="./node_modules/.bin:$PATH"
 ```
-then you have to type the commands like this:
+or you had installed `release-script` globally via `npm install -g release-script`,
+then you can release your new versions this way:
 ```sh
-> ./node_modules/.bin/release minor --preid alpha --run
+> release patch
+or
+> release minor --preid alpha
 ```
 
-Or you just can install `release-script` globally.
+Otherwise you need to type in the commands this way:
+```sh
+> ./node_modules/.bin/release minor --preid alpha
+```
 
-You also can add some helpful `script` commands to your `package.json`,
-and because `npm` adds `node_modules/.bin` into `PATH` for running scripts automatically,
-you can add them just like that:
+You can as well add some helpful `script` commands to your `package.json`:
 ```json
 "scripts": {
     ...
-    "patch": "release patch --run",
-    "minor": "release minor --run",
-    "major": "release major --run",
-    "release-dry-run": "release patch"
+    "patch": "release patch",
+    "minor": "release minor",
+    "major": "release major"
 ```
 
-Also you can add it like this:
+And you can add it like this:
 ```json
 "scripts": {
     ...
     "release": "release",
 ```
-And then you can run it like that:
+This way it became possible to run it like that:
 ```
-> npm run release minor -- --preid alpha --run
-> npm run release patch -- --notes "This is small fix --run"
-> npm run release major // for dry run
+> npm run release minor -- --preid alpha
+> npm run release patch -- --notes "This is small fix"
+> npm run release major --dry-run // for dry run
 etc
 ```
-_Notice: you have to add additional `--` before any `--option`. That way additional options will get straight to `release-script`._
+_Notice: You have to add additional double slash `--` before any `--option`. This way additional options get through to `release-script`._
 
 
 ## License
