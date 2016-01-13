@@ -170,6 +170,18 @@ You can set a custom message for github release via `--notes` CLI option:
 > release patch --notes "This is a small fix"
 ```
 
+#### If you need `dry-run` mode by default
+
+You can setup the `release-script` to run in `dry-run` mode by default.
+
+It can be done by setting `"true"` the `defaultDryRun` option in your `package.json`:
+```json
+"release-script": {
+  "defaultDryRun": "true"
+}
+```
+Then to actually run your commands you will have to add `--run`.
+
 
 #### This script does the following steps:
 

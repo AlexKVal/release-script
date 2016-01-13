@@ -83,6 +83,9 @@ const yargsConf = yargs
     alias: 'n',
     describe: 'This option toggles "dry run" mode'
   })
+  .option('run', {
+    describe: 'You need this when "defaultDryRun": "true"'
+  })
   .option('verbose', {
     describe: 'Increased debug output'
   })
@@ -115,8 +118,26 @@ if (!argv.skipVersionBumping && versionBumpOptions.type === undefined && version
 
 let notesForRelease = argv.notes;
 
-const dryRunMode = argv.dryRun;
-if (dryRunMode) console.log('DRY RUN'.magenta);
+const isDefaultDryRunOptionSetTrue =
+  configOptions.defaultDryRun === true ||
+  configOptions.defaultDryRun === 'true';
+
+let dryRunMode;
+if (argv.run) {
+  dryRunMode = false;
+} else {
+  dryRunMode = argv.dryRun || isDefaultDryRunOptionSetTrue;
+}
+
+if (dryRunMode) {
+  console.log('DRY RUN'.magenta);
+
+  if (isDefaultDryRunOptionSetTrue) {
+    console.log('------------------------------------------------------');
+    console.log('To actually run your command please add "--run" option'.yellow);
+    console.log('------------------------------------------------------');
+  }
+}
 
 if (argv.preid) console.log('"--preid" detected. Documents will not be published'.yellow);
 if (argv.onlyDocs && !argv.preid) console.log('Publish only documents'.yellow);
