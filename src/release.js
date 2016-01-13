@@ -52,7 +52,6 @@ const altPkgRootFolder = configOptions.altPkgRootFolder;
 
 const skipBuildStep = configOptions.skipBuildStep;
 
-const defaultDryRun = configOptions.defaultDryRun !== 'false';
 
 //------------------------------------------------------------------------------
 // command line options
@@ -80,12 +79,9 @@ const yargsConf = yargs
     alias: 'docs',
     describe: 'Publish only documents'
   })
-  .option('run', {
-    describe: 'Actually execute command'
-  })
   .option('dry-run', {
     alias: 'n',
-    describe: 'With "defaultDryRun" option set this toggles "dry run" mode'
+    describe: 'This option toggles "dry run" mode'
   })
   .option('verbose', {
     describe: 'Increased debug output'
@@ -119,18 +115,8 @@ if (!argv.skipVersionBumping && versionBumpOptions.type === undefined && version
 
 let notesForRelease = argv.notes;
 
-let dryRunMode = argv.dryRun || defaultDryRun;
-if (argv.run) {
-  dryRunMode = false;
-}
-if (dryRunMode) {
-  console.log('DRY RUN'.magenta);
-  if (defaultDryRun) {
-    console.log('------------------------------------------------------');
-    console.log('To actually run your command please add "--run" option'.yellow);
-    console.log('------------------------------------------------------');
-  }
-}
+const dryRunMode = argv.dryRun;
+if (dryRunMode) console.log('DRY RUN'.magenta);
 
 if (argv.preid) console.log('"--preid" detected. Documents will not be published'.yellow);
 if (argv.onlyDocs && !argv.preid) console.log('Publish only documents'.yellow);
