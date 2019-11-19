@@ -130,6 +130,9 @@ by setting `'release-script'.skipBuildStep` option:
 }
 ```
 
+####Skip publishing
+If you don't want to publish your package in `npm`, `bower` or `github` make sure to have the package marked as `private` or set `skipPublishing` options to true in `release-script`  
+
 #### Options
 
 All options for this package are kept under `'release-script'` node in your project's `package.json`
@@ -140,6 +143,10 @@ All options for this package are kept under `'release-script'` node in your proj
 - `tmpBowerRepo` - the folder name for temporary files for bower pkg.
   - `default` value: `'tmp-bower-repo'`
 - `altPkgRootFolder` - the folder name for alternative npm package's root folder
+- `skipBuildStep` - will skip the build step during the release
+    - `default` value: `false`
+- `skipPublishing`
+    - `default` value: `false`
 
 It is advised to add `bowerRoot` and `tmpBowerRepo` folders to your `.gitignore` file.
 
@@ -149,7 +156,9 @@ Example:
   "bowerRepo": "git@github.com:<org-author-name>/<name-of-project>-bower.git",
   "bowerRoot": "amd",
   "tmpBowerRepo": "tmp-bower-repo",
-  "altPkgRootFolder": "lib"
+  "altPkgRootFolder": "lib",
+  "skipBuildSte": false,
+  "skipPublishing": false
 }
 ```
 
@@ -212,7 +221,7 @@ Then to actually run your commands you will have to add `--run`.
 - if `docsRepo` option is set then documentation pages are being pushed to their repo.
   It is done the same way as `bower` publishing process.
 
-If `--only-docs` command line option is set then `github`, `npm` and `bower` publishing steps will be skipped.
+If `--only-docs` or `--skip-publishing` command line option is set then `github`, `npm` and `bower` publishing steps will be skipped.
 
 ## Installation
 
