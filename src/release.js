@@ -51,6 +51,7 @@ const githubToken = process.env.GITHUB_TOKEN;
 const altPkgRootFolder = configOptions.altPkgRootFolder;
 
 const skipBuildStep = configOptions.skipBuildStep;
+const skipPublish = configOptions.skipPublish;
 
 
 //------------------------------------------------------------------------------
@@ -373,8 +374,8 @@ function release({ type, preid, npmTagName }) {
     }
 
     // npm
-    if (isPrivate) {
-      console.log('Package is private, skipping npm release'.yellow);
+    if (isPrivate || skipPublish) {
+      console.log('Skipping npm release'.yellow);
     } else {
       console.log('Releasing: '.cyan + 'npm package'.green);
 
@@ -402,8 +403,8 @@ function release({ type, preid, npmTagName }) {
       console.log('Released: '.cyan + 'npm package'.green);
     }
     // bower (separate repo)
-    if (isPrivate) {
-      console.log('Package is private, skipping bower release'.yellow);
+    if (isPrivate || skipPublish) {
+      console.log('Skipping bower release'.yellow);
     } else if (bowerRepo) {
       console.log('Releasing: '.cyan + 'bower package'.green);
       releaseAdRepo(bowerRepo, bowerRoot, tmpBowerRepo, vVersion);
